@@ -1,0 +1,34 @@
+////////////////////////////////////////////////
+//  IFR  //  DESENVOLVIDO POR: HÉBER SILVÉRIO //
+////////////////////////////////////////////////
+
+   // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
+begin
+   if (RSI(9, 0) > 70) then PaintBar(clGreen);
+   if (RSI(9, 0) < 30) then PaintBar(clRed);
+   if ( (RSI(9, 0) < 70) and (RSI(9, 0) > 30) ) then PaintBar(clYellow);
+
+      // Verifica se está comprado,
+      // Se estiver envia um TrailingStopLimit na Venda
+   if (IsBought) then
+      begin
+         SellToCoverStop(Low[1]);
+      end
+
+      // Verifica se deve abrir uma posição,
+      // com o ativo sobrecomprado ou sobrevendido
+   else if (IsSold) then
+      begin
+         BuyToCoverStop(High[1]);
+      end
+
+      // Verifica se deve abrir uma posição,
+      // com o ativo sobrecomprado ou sobrevendido
+   else if (RSI(9, 0) > 70) then
+      BuyAtMarket
+   else if (RSI(9, 0) < 30) then
+      SellShortAtMarket;
+
+      // Plotar o RSI no gráfico
+   Plot(RSI(9, 0));
+end;
