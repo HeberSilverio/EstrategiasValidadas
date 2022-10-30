@@ -2,11 +2,14 @@
 //  IFR  //  DESENVOLVIDO POR: HÉBER SILVÉRIO //
 ////////////////////////////////////////////////
 
+//MELHOR PERFORMANCE
+// Renko de 13R - 35x65 - Fator de lucro 1,96 
+
    // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
 begin
-   if (RSI(9, 0) > 70) then PaintBar(clGreen);
-   if (RSI(9, 0) < 30) then PaintBar(clRed);
-   if ( (RSI(9, 0) < 70) and (RSI(9, 0) > 30) ) then PaintBar(clYellow);
+   if (RSI(9, 0) > 65) then PaintBar(clVerde);
+   if (RSI(9, 0) < 35) then PaintBar(clMarrom);
+   if ( (RSI(9, 0) < 65) and (RSI(9, 0) > 35) ) then PaintBar(clCinzaEscuro);
 
       // Verifica se está comprado,
       // Se estiver envia um TrailingStopLimit na Venda
@@ -24,11 +27,11 @@ begin
 
       // Verifica se deve abrir uma posição,
       // com o ativo sobrecomprado ou sobrevendido
-   else if (RSI(9, 0) > 70) then
+   else if (RSI(9, 0) > 65) then
       BuyAtMarket
-   else if (RSI(9, 0) < 30) then
+   else if (RSI(9, 0) < 35) then
       SellShortAtMarket;
 
       // Plotar o RSI no gráfico
-   Plot(RSI(9, 0));
+   //Plot(RSI(9, 0));
 end;

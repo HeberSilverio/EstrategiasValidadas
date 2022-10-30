@@ -1,0 +1,16 @@
+////////////////////////////////////////////////
+//  IFR  //  DESENVOLVIDO POR: HÉBER SILVÉRIO //
+////////////////////////////////////////////////
+
+//MELHOR PERFORMANCE 
+// DOL 4R - 70x30 - Fator de lucro 1,80
+
+   // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
+begin
+   if ((RSI(9, 0) > 70) and (Fechamento > MediaExp(9,Close)[4])) then PaintBar(clVerde);
+   if ((RSI(9, 0) < 30) and (Fechamento < MediaExp(9,Close)[4])) then PaintBar(clMarrom);
+   if ( (RSI(9, 0) < 70) and (RSI(9, 0) > 30) ) then PaintBar(clCinzaEscuro);
+
+      // Plotar o RSI no gráfico
+   Plot(RSI(9, 0));
+end;
