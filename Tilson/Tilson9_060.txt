@@ -1,0 +1,26 @@
+Inicio
+   Inicio
+      Se (Fechamento > TILSON(0.60,9)[1]) então
+         PaintBar(clVerde)
+      Senão Se (Fechamento < TILSON(0.60,9)[1]) então
+         PaintBar(clMarrom);
+   fim;
+   
+   Se (IsSold) então
+      Inicio
+         Se (Fechamento > TILSON(0.60,9)) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         Se (Fechamento < TILSON(0.60,9)) então
+            SellToCoverAtMarket;
+      fim
+   Senão
+      Inicio
+         Se (Fechamento > TILSON(0.60,9)) então
+            BuyAtMarket
+         Senão Se (Fechamento < TILSON(0.60,9)) então
+            SellShortAtMarket;
+      Fim;
+Fim;
