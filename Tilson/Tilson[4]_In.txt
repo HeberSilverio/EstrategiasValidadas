@@ -1,0 +1,38 @@
+////////////////////////////////////////////////
+//  IFR  //  DESENVOLVIDO POR: HÉBER SILVÉRIO //
+////////////////////////////////////////////////
+
+//MELHOR PERFORMANCE
+// Renko de 13R - 35x65 - Fator de lucro 1,96 
+
+   // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
+begin
+   Se (Fechamento > TILSON(0.60,9)[1]) então
+      PaintBar(clVerde)
+   Senão Se (Fechamento < TILSON(0.60,9)[1]) então
+      PaintBar(clMarrom);
+
+      // Verifica se está comprado,
+      // Se estiver envia um TrailingStopLimit na Venda
+   if (IsBought) then
+      begin
+         SellToCoverStop(Low[1]);
+      end
+
+      // Verifica se deve abrir uma posição,
+      // com o ativo sobrecomprado ou sobrevendido
+   else if (IsSold) then
+      begin
+         BuyToCoverStop(High[1]);
+      end
+
+      // Verifica se deve abrir uma posição,
+      // com o ativo sobrecomprado ou sobrevendido
+   else if ((Fechamento > TILSON(0.01,5)) e (Fechamento[1] > TILSON(0.01,5))) then
+      BuyAtMarket
+   else if ((Fechamento < TILSON(0.01,5)) e (Fechamento[1] < TILSON(0.01,5))) then
+      SellShortAtMarket;
+
+      // Plotar o RSI no gráfico
+   Plot(TILSON(0.60,9));
+end;

@@ -1,0 +1,6 @@
+Inicio
+  Se (Fechamento > TILSON(0.45,9)[1]) então
+    PaintBar(clVerde)
+  Senão Se (Fechamento < TILSON(0.45,9)[1]) então
+    PaintBar(clMarrom);
+Fim;
