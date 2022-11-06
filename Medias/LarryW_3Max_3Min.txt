@@ -1,5 +1,5 @@
 var
-   spred, fh, fsg, fsl, points, stopGain, stopLoss, mmmx, mmmn : float
+   spred, fh, fsg, fsl, points, stopGain, stopLoss, mmmx, mmmn : float;
    ccc, vvv: boolean;
 
 begin
