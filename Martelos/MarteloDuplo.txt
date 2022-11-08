@@ -1,0 +1,55 @@
+////////////////////////////////////////////////
+//  MARTELO DUPLO  //  DESENVOLVIDO POR: HÉBER SILVÉRIO //
+////////////////////////////////////////////////
+
+//MELHOR PERFORMANCE 
+// DOL 4R - 70x30 - Fator de lucro 1,80
+
+   // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
+var
+MarteloAnteriorCompra : boolean;
+MarteloAtualCompra : boolean;
+MarteloAnteriorVenda : boolean;
+MarteloAtualVenda : boolean;
+SinalCompra : boolean;
+SinalVenda : boolean;
+valor_LossCompra, valor_lossVenda : float;
+LossCompra : boolean;
+LossVenda : boolean;
+begin
+
+      MarteloAnteriorCompra := ((Fechamento[1] > Abertura[1]) e (Minima[1] < Abertura[1]));
+      MarteloAtualCompra := ((Fechamento[0] > Abertura[0]) e (Minima[0] < Abertura[0]));
+      MarteloAnteriorVenda := ((Fechamento[1] < Abertura[1]) e (Maxima[1] > Abertura[1]));
+      MarteloAtualVenda := ((Fechamento[0] < Abertura[0]) e (Maxima[0] > Abertura[0])); 
+      SinalCompra := ((MarteloAnteriorCompra = Verdadeiro) e (MarteloAtualCompra = Verdadeiro) e (time < 1700));
+      SinalVenda := ((MarteloAnteriorVenda = Verdadeiro) e (MarteloAtualVenda = Verdadeiro)e (time < 1700)); 
+      valor_LossCompra := BuyPrice - Range;
+      valor_lossVenda := SellPrice + Range;
+      LossCompra := (Fechamento < valor_LossCompra);
+      LossVenda := (Fechamento > valor_lossVenda);
+      if  (SinalCompra = Verdadeiro) then 
+         PaintBar(clVerde);
+      if  (SinalVenda = Verdadeiro) then
+         PaintBar(clMarrom); 
+
+
+  
+      Se (IsSold)  então
+         Inicio
+            Se ( (SinalCompra = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+            BuyToCoverAtMarket;
+         fim
+      Senão Se (IsBought)  então
+         Inicio
+            Se ( (SinalVenda = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+            SellToCoverAtMarket;
+         fim
+      Senão 
+         Inicio
+            Se ( (SinalCompra = Verdadeiro)  ) então
+               BuyAtMarket
+            Senão Se ( (SinalVenda = Verdadeiro) )  então
+               SellShortAtMarket;
+         Fim;
+end;

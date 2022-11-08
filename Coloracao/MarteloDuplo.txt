@@ -1,0 +1,31 @@
+////////////////////////////////////////////////
+//  MARTELO DUPLO  //  DESENVOLVIDO POR: HÉBER SILVÉRIO //
+////////////////////////////////////////////////
+
+//MELHOR PERFORMANCE 
+// DOL 4R 
+
+   // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
+var
+ThorOneUp : boolean;
+ThorZeroUp : boolean;
+ThorOneVenda : boolean;
+ThorZeroVenda : boolean;
+
+
+SinalCompra : boolean;
+SinalVenda : boolean;
+
+begin
+   ThorOneUp := ((Fechamento[1] > Abertura[1]) e (Minima[1] < Abertura[1]));
+   ThorZeroUp := ((Fechamento[0] > Abertura[0]) e (Minima[0] < Abertura[0]));
+   ThorOneVenda := ((Fechamento[1] < Abertura[1]) e (Maxima[1] > Abertura[1]));
+   ThorZeroVenda := ((Fechamento[0] < Abertura[0]) e (Maxima[0] > Abertura[0])); 
+   SinalCompra := ((ThorOneUp = Verdadeiro) e (ThorZeroUp = Verdadeiro) e (time < 1700));
+   SinalVenda := ((ThorOneVenda = Verdadeiro) e (ThorZeroVenda = Verdadeiro)e (time < 1700)); 
+
+   if  (SinalCompra = Verdadeiro) then 
+      PaintBar(clVerde);
+   if  (SinalVenda = Verdadeiro) then
+      PaintBar(clMarrom); 
+end;

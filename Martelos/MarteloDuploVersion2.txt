@@ -1,0 +1,95 @@
+////////////////////////////////////////////////
+//  MARTELO DUPLO  //  DESENVOLVIDO POR: HÉBER SILVÉRIO //
+////////////////////////////////////////////////
+
+//MELHOR PERFORMANCE 
+// DOL 4R - 70x30 - Fator de lucro 1,80
+
+   // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
+var
+ThorOneUp : boolean;
+ThorZeroUp : boolean;
+ThorOneVenda : boolean;
+ThorZeroVenda : boolean;
+
+CandleZeroUp : boolean;
+CandleOneUp : boolean;
+CandleTwoUp : boolean;
+
+CandleZeroDown : boolean;
+CandleOneDown : boolean;
+CandleTwoDown : boolean;
+
+TopTurn : boolean;
+BottomTurn : boolean;
+
+SinalCompra : boolean;
+SinalVenda : boolean;
+
+valor_LossCompra, valor_lossVenda : float;
+LossCompra : boolean;
+LossVenda : boolean;
+
+FirstConditionBuy : boolean; 
+SecondConditionBuy : boolean;
+
+FirstConditionSell : boolean;
+SecondConditionSell : boolean;
+
+begin 
+      CandleZeroUp := ( (Fechamento[0] > Abertura[0]) ); 
+      CandleOneUp := ( (Fechamento[1] > Abertura[1]) );
+      CandleTwoUp := ( (Fechamento[2] > Abertura[2]) );
+
+      CandleZeroDown := ( (Fechamento[0] < Abertura[0]) );
+      CandleOneDown := ( (Fechamento[1] < Abertura[1]) );
+      CandleTwoDown := ( (Fechamento[2] < Abertura[2]) );
+
+      ThorOneUp := ((Fechamento[1] > Abertura[1]) e (Minima[1] < Abertura[1]));
+      ThorZeroUp := ((Fechamento[0] > Abertura[0]) e (Minima[0] < Abertura[0]));
+      ThorOneVenda := ((Fechamento[1] < Abertura[1]) e (Maxima[1] > Abertura[1]));
+      ThorZeroVenda := ((Fechamento[0] < Abertura[0]) e (Maxima[0] > Abertura[0])); 
+
+      TopTurn := (CandleOneUp e CandleTwoUp e ThorZeroVenda);
+      BottomTurn := (CandleTwoDown e CandleOneDown e ThorZeroUp);
+      
+      valor_LossCompra := BuyPrice - Range;
+      valor_lossVenda := SellPrice + Range;
+      LossCompra := (Fechamento < valor_LossCompra);
+      LossVenda := (Fechamento > valor_lossVenda);
+
+      FirstConditionBuy := ((ThorZeroUp = Verdadeiro) e (CandleOneUp = Verdadeiro));
+      SecondConditionBuy := ((ThorOneUp = Verdadeiro) e (CandleZeroUp = Verdadeiro));
+
+      FirstConditionSell := ( (ThorZeroVenda = Verdadeiro) e (CandleOneDown = Verdadeiro) ); 
+      SecondConditionSell := ( (ThorOneVenda = Verdadeiro) e (CandleZeroDown = Verdadeiro) );
+
+      SinalCompra := ( ((FirstConditionBuy = Verdadeiro) ou (SecondConditionBuy = Verdadeiro)) e (time < 1700));
+      SinalVenda := ((FirstConditionSell = Verdadeiro) ou (SecondConditionSell = Verdadeiro)e (time < 1700)); 
+
+      //Coloração
+      if  (SinalCompra = Verdadeiro) then 
+         PaintBar(clVerde);
+      if  (SinalVenda = Verdadeiro) then
+         PaintBar(clMarrom); 
+
+
+      //Inicio da estratégia de execução
+      Se (IsSold)  então
+         Inicio
+            Se ( (SinalCompra = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+            BuyToCoverAtMarket;
+         fim
+      Senão Se (IsBought)  então
+         Inicio
+            Se ( (SinalVenda = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+            SellToCoverAtMarket;
+         fim
+      Senão 
+         Inicio
+            Se ( (SinalCompra = Verdadeiro)  ) então
+               BuyAtMarket
+            Senão Se ( (SinalVenda = Verdadeiro) )  então
+               SellShortAtMarket;
+         Fim;
+end;
