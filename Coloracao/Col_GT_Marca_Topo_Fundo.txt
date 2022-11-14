@@ -1,0 +1,21 @@
+var
+  tf,topo,fundo : Real;
+Inicio
+
+  tf := TopBottomDetector(5);
+
+  Se (tf <> 0) e (tf = Maxima) entao topo := tf Senao topo := topo[1];
+  Se (tf <> 0) e (tf = Minima) entao fundo := tf Senao fundo := fundo[1]; 
+
+  Se topo <> topo[1] entao NoPlot(1);
+  Se fundo <> fundo[1] entao NoPlot(2);
+
+  
+  Se (Maxima[1] < topo) e (Maxima >= topo) entao PaintBar(255);
+  Se (Minima[1] > fundo) e (Minima <= fundo) entao PaintBar(clLime);
+   
+  Plot(topo);
+  Plot2(fundo);
+
+
+Fim;

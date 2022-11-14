@@ -1,0 +1,55 @@
+var
+   tf,topo,fundo : Real;
+   SinalCompra : boolean;
+   SinalVenda : boolean;
+   valor_LossCompra, valor_lossVenda : float;
+   LossCompra : boolean;
+   LossVenda : boolean;
+   MarteloAtualCompra : boolean;
+   MarteloAtualVenda : boolean;
+
+   AcheiTopo : boolean;
+   AcheiFundo : boolean;
+
+Inicio
+   MarteloAtualCompra := ((Fechamento[0] > Abertura[0]) e (Minima[0] < Abertura[0]));
+   MarteloAtualVenda := ((Fechamento[0] < Abertura[0]) e (Maxima[0] > Abertura[0])); 
+   valor_LossCompra := BuyPrice - Range;
+   valor_lossVenda := SellPrice + Range;
+   LossCompra := (Fechamento < valor_LossCompra);
+   LossVenda := (Fechamento > valor_lossVenda);
+
+
+   tf := TopBottomDetector(5);
+
+   Se (tf <> 0) e (tf = Maxima) entao topo := tf Senao topo := topo[1];
+   Se (tf <> 0) e (tf = Minima) entao fundo := tf Senao fundo := fundo[1]; 
+
+   Se topo <> topo[1] entao NoPlot(1);
+   Se fundo <> fundo[1] entao NoPlot(2);
+
+   SinalVenda := (Maxima[1] < topo) e (Maxima >= topo)  e (MarteloAtualVenda = Verdadeiro); 
+   SinalCompra := (Minima[1] > fundo) e (Minima <= fundo) e (MarteloAtualCompra = Verdadeiro);
+   
+   Se (IsSold)  então
+      Inicio
+         Se ( (SinalCompra = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+         BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought)  então
+      Inicio
+         Se ( (SinalVenda = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+         SellToCoverAtMarket;
+      fim
+   Senão 
+      Inicio
+         Se ( (SinalCompra = Verdadeiro)  ) então
+            BuyAtMarket
+         Senão Se ( (SinalVenda = Verdadeiro) )  então
+            SellShortAtMarket;
+      Fim;
+
+  Plot(topo);
+  Plot2(fundo);
+
+Fim;

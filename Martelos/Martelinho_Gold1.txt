@@ -1,29 +1,64 @@
-{   MARTELO GOLD VERSÃO 1
+{   CÓDIGO PARA COMPRAR A MERCADO CASO FAÇO MARTELO ACIMA DO HILO
 
 MELHOR PERFORMANCE
 - renko de 13r - Fator de lucro 2,21 semestral
 - renko de 18r - Fator de lucro 2,37 semestral
 }
+var
+ValorMACD : float;
+SinalCompra : boolean;
+SinalVenda : boolean;
+ValorHilo : float;
+DistanciaHiloCompra : boolean;
+DistanciaHiloVenda : boolean;
+MarteloCompra : boolean;
+MarteloVenda : boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;
+
 Inicio
-  Inicio
-    Se (close > HILOACTIVATOR(21)) então
-      PaintBar(clVerde)
-    Senão Se (close < HILOACTIVATOR(21)) então
-      PaintBar(clMarrom);
-  Fim;
-  Se (IsSold) ou (Time > 1740) então
+   ValorMACD := MACD(130,19,19)|1|;
+   ValorHilo := (HILOACTIVATOR(33));
+   DistanciaHiloCompra := ((Fechamento - ValorHilo) < 500);
+   DistanciaHiloVenda := ((ValorHilo - Fechamento) < 500);
+   MarteloCompra := ((Fechamento > Abertura) e (Minima < Abertura));
+   MarteloVenda := ((Fechamento < Abertura) e (Maxima > Abertura));
+   SinalCompra := ((MarteloCompra = Verdadeiro) e (DistanciaHiloCompra = Verdadeiro) e (time < 1700));
+   SinalVenda := ((MarteloVenda = Verdadeiro) e (DistanciaHiloVenda = Verdadeiro) e (time < 1700));
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   StopGainCompra := ((Maxima - pCompra) >= 300);  
+   StopGainVenda := ((pVenda - Minima) >= 300); 
+   
+  Se (IsSold) então
     Inicio
-      BuyToCoverStop(High[1]);
+      Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+        BuyToCoverAtMarket(1)
+      Senão Se (close > HILOACTIVATOR(33)) ou (Time > 1740) então
+         begin
+            closePosition; 
+            cancelPendingOrders; 
+         end;
+        //BuyToCoverAtMarket;
     fim
-  Senão Se (IsBought) ou (Time > 1740) então
+  Senão Se (IsBought) então
     Inicio
-      SellToCoverStop(Low[1]);
+      Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+        SellToCoverAtMarket(1) 
+      Senão Se (close < HILOACTIVATOR(33)) ou (Time > 1740) então
+         begin
+            closePosition; 
+            cancelPendingOrders; 
+         end;
+        //SellToCoverAtMarket;
     fim
   Senão 
     Inicio
-      Se ((Fechamento > Abertura) e (Minima < Abertura)) e (MACD(150,14,14) > 1) e (close > HILOACTIVATOR(21)) e (Time < 1730) então
-        BuyAtMarket
-      Senão Se ((Fechamento < Abertura) e (Maxima > Abertura)) e (MACD(150,14,14) < 1) e (close < HILOACTIVATOR(21)) e (Time < 1730) então
-        SellShortAtMarket;
+      Se ( (close > HILOACTIVATOR(33)) e (ValorMACD > 0) e (SinalCompra = Verdadeiro) ) então
+        BuyAtMarket(2)
+      Senão Se ( (ValorMACD < 0) e (close < HILOACTIVATOR(33)) e (SinalVenda = Verdadeiro) )  então
+        SellShortAtMarket(2);
     Fim;
 Fim;

@@ -13,6 +13,10 @@ DistanciaHiloCompra : boolean;
 DistanciaHiloVenda : boolean;
 MarteloCompra : boolean;
 MarteloVenda : boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;
 
 Inicio
    ValorMACD := MACD(130,19,19)|1|;
@@ -22,16 +26,24 @@ Inicio
    MarteloCompra := ((Fechamento > Abertura) e (Minima < Abertura));
    MarteloVenda := ((Fechamento < Abertura) e (Maxima > Abertura));
    SinalCompra := ((MarteloCompra = Verdadeiro) e (DistanciaHiloCompra = Verdadeiro) e (time < 1700));
-   SinalVenda := ((MarteloVenda = Verdadeiro) e (DistanciaHiloVenda = Verdadeiro)e (time < 1700));
-  
-  Se (IsSold) ou (Time > 1740) então
+   SinalVenda := ((MarteloVenda = Verdadeiro) e (DistanciaHiloVenda = Verdadeiro) e (time < 1700));
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   StopGainCompra := ((Maxima - pCompra) >= 300);  
+   StopGainVenda := ((pVenda - Minima) >= 300); 
+   
+  Se (IsSold) então
     Inicio
-      Se (close > HILOACTIVATOR(33)) então
+      Se (StopGainVenda = Verdadeiro) então
+        BuyToCoverAtMarket
+      Senão Se (close > HILOACTIVATOR(33)) ou (Time > 1740) então
         BuyToCoverAtMarket;
     fim
-  Senão Se (IsBought) ou (Time > 1740) então
+  Senão Se (IsBought) então
     Inicio
-      Se (close < HILOACTIVATOR(33)) então
+      Se (StopGainCompra = Verdadeiro) então
+        SellToCoverAtMarket 
+      Senão Se (close < HILOACTIVATOR(33)) ou (Time > 1740) então
         SellToCoverAtMarket;
     fim
   Senão 
