@@ -1,0 +1,55 @@
+////////// PREÇO DE REVERSÃO COM ESTOCÁSTICO LENTO //////////
+
+//Melhor PERFORMANCE 35r
+
+var
+valor_LossCompra : float;
+LossCompra : boolean;
+
+pCompra : float;
+StopGainCompra : boolean;
+
+SinalCompra : boolean;
+SinalVenda : boolean;
+
+ThorZeroUp : boolean;
+ThorZeroVenda : boolean;
+nEstLen : float;
+Estoc20 : boolean;
+Estoc80 : boolean;
+
+
+
+begin
+  
+   pCompra := BuyPrice;
+   valor_LossCompra := Low;
+   LossCompra := (Fechamento < valor_LossCompra);
+   StopGainCompra := ((Maxima - pCompra) >= 300);  
+
+   ThorZeroUp := ((Fechamento[0] > Abertura[0]) e (Minima[0] < Abertura[0]));
+   ThorZeroVenda := ((Fechamento[0] < Abertura[0]) e (Maxima[0] > Abertura[0])); 
+
+   nEstLen := SlowStochastic(8);
+   Estoc20 := (SlowStochastic(8) < 20);
+   Estoc80 := (SlowStochastic(8) > 80);
+
+   SinalCompra := (ThorZeroUp = Verdadeiro) e (Estoc20 = Verdadeiro);
+   SinalVenda := (SlowStochastic(8) > 80);  
+
+   if (IsBought) then
+      Inicio
+         Se (LossCompra = Verdadeiro) então
+            BuyToCoverAtMarket
+         Senão Se (close > HILOACTIVATOR(33)) ou (Time > 1740) então
+            BuyToCoverAtMarket;
+      fim
+
+
+   Senão 
+      Inicio
+         Se ( (SinalCompra = Verdadeiro)  ) then
+            BuyAtMarket; 
+      fim;
+end;
+

@@ -1,0 +1,54 @@
+////////// PREÇO DE REVERSÃO COM ESTOCÁSTICO LENTO //////////
+
+//Melhor PERFORMANCE 35r
+
+var
+valor_LossCompra, valor_lossVenda : float;
+LossCompra : boolean;
+LossVenda : boolean;
+
+SinalCompra : boolean;
+SinalVenda : boolean;
+
+ThorZeroUp : boolean;
+ThorZeroVenda : boolean;
+nEstLen : float;
+Estoc20 : boolean;
+Estoc80 : boolean;
+
+begin
+
+   valor_LossCompra := BuyPrice - Range;
+   valor_lossVenda := SellPrice + Range;
+   LossCompra := (Fechamento < valor_LossCompra);
+   LossVenda := (Fechamento > valor_lossVenda);
+
+   ThorZeroUp := ((Fechamento[0] > Abertura[0]) e (Minima[0] < Abertura[0]));
+   ThorZeroVenda := ((Fechamento[0] < Abertura[0]) e (Maxima[0] > Abertura[0])); 
+
+   nEstLen := SlowStochastic(8);
+   Estoc20 := (SlowStochastic(8) < 20);
+   Estoc80 := (SlowStochastic(8) > 80);
+
+   SinalCompra := (ThorZeroUp = Verdadeiro) e (Estoc20 = Verdadeiro);
+   SinalVenda := (ThorZeroVenda = Verdadeiro) e (Estoc80 = Verdadeiro);  
+
+   Se (IsSold)  então
+         Inicio
+            Se ( (nEstLen < 20) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+               BuyToCoverAtMarket;
+         fim
+      Senão Se (IsBought)  então
+         Inicio
+            Se ( (nEstLen > 80) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+               SellToCoverAtMarket;
+         fim
+      Senão 
+         Inicio
+            Se ( (SinalCompra = Verdadeiro)  ) then
+               BuyAtMarket 
+            Senão Se ( (SinalVenda = Verdadeiro) )  então
+               SellToCoverAtMarket;
+         fim;
+end;
+

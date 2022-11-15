@@ -3,9 +3,8 @@
 ////////////////////////////////////////////////
 
 //MELHOR PERFORMANCE 
-// DOL 4R - 70x30 - Fator de lucro 1,80
+// 25R indice
 
-   // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
 var
 ThorOneUp : boolean;
 ThorZeroUp : boolean;
@@ -26,9 +25,14 @@ BottomTurn : boolean;
 SinalCompra : boolean;
 SinalVenda : boolean;
 
+pCompra : float;
+pVenda : float;
+
 valor_LossCompra, valor_lossVenda : float;
 LossCompra : boolean;
 LossVenda : boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
 
 FirstConditionBuy : boolean; 
 SecondConditionBuy : boolean;
@@ -67,23 +71,26 @@ begin
       SinalCompra := ( ((FirstConditionBuy = Verdadeiro) ou (SecondConditionBuy = Verdadeiro)) e (time < 1700));
       SinalVenda := ((FirstConditionSell = Verdadeiro) ou (SecondConditionSell = Verdadeiro)e (time < 1700)); 
 
-      //Coloração
-      if  (SinalCompra = Verdadeiro) then 
-         PaintBar(clVerde);
-      if  (SinalVenda = Verdadeiro) then
-         PaintBar(clMarrom); 
+      pCompra := BuyPrice;
+      pVenda := SellPrice;
+      StopGainCompra := ((Maxima - pCompra) >= 300);  
+      StopGainVenda := ((pVenda - Minima) >= 300); 
 
 
       //Inicio da estratégia de execução
       Se (IsSold)  então
          Inicio
-            Se ( (BottomTurn = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
-            BuyToCoverAtMarket;
+            Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+               BuyToCoverAtMarket(1)
+            Senão Se ( (BottomTurn = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+               BuyToCoverAtMarket;
          fim
       Senão Se (IsBought)  então
          Inicio
-            Se ( (TopTurn = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
-            SellToCoverAtMarket;
+            Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+               SellToCoverAtMarket(1) 
+            Senão Se ( (TopTurn = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+               SellToCoverAtMarket;
          fim
       Senão 
          Inicio

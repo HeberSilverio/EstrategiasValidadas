@@ -1,0 +1,9 @@
+------ Regra de Coloração Tabajara ------- para Inserção nos Candles/Box
+
+Inicio
+  Se (Fechamento (sinal de maior) Fechamento[1]) e (Fechamento (sinal de maior) Media(21,Close)) e (Media(21,Close) (sinal de maior) Media(21,Close)[1]) então
+    PaintBar(clVerde)
+  Senão Se (Fechamento (sinal de menor) Fechamento[1]) e (Fechamento (sinal de menor) Media(21,Close)) e (Media(21,Close) (sinal de menor) Media(21,Close)[1]) então
+    PaintBar(clVermelho);
+Fim;
+----------- Fim da regra de coloração Tabajara -----------------

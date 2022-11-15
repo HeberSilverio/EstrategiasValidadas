@@ -1,5 +1,5 @@
 var
-   tf,topo,fundo : Real;
+   RG,topo,fundo : Real;
    SinalCompra : boolean;
    SinalVenda : boolean;
    valor_LossCompra, valor_lossVenda : float;
