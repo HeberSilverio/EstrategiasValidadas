@@ -1,0 +1,20 @@
+begin
+  If (BuyPosition =0) and (SellPosition = 0) then 
+    begin
+  Se (Fechamento < Fechamento[1]) e (highest(High,2) > highest(high,2)[1]) e (SlowStochastic(8)>80) e (MediaExp(9,close) < (Media(21,close))) then
+  SellShortAtMarket; 
+end;
+ 
+   If (SellPosition = 1) then
+     begin 
+         BuyToCoverStop(SellPrice - 900, SellPrice - 900);
+         BuyToCoverStop(SellPrice + 500, SellPrice + 500); 
+  
+  If (SlowStochastic(8) < 20) then
+  BuyToCoverAtMarket;
+
+  If (time > 1700) then
+           BuyToCoverAtMarket; 
+
+    end;
+end;

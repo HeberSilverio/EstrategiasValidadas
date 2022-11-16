@@ -1,0 +1,51 @@
+var
+MediaExp21 : float;
+MediaExp50 : float;
+MediaExp200 : float;
+ValorMACD : float;
+Condicao1 : boolean;
+Condicao2 : boolean;
+Condicao3 : boolean;
+SinalCompra : boolean;
+SinalVenda : boolean;
+valor_LossCompra, valor_lossVenda : float;
+LossCompra : boolean;
+LossVenda : boolean;
+
+Inicio
+   MediaExp21 := (MediaExp(21,close));
+   MediaExp50 := (MediaExp(50,close));
+   MediaExp200 := (MediaExp(200,close));
+   ValorMACD := MACD(130,19,19)|1|;
+   Condicao1 := (MediaExp21 > MediaExp50) e (MediaExp50 > MediaExp200);
+   Condicao2 := (Fechamento > MediaExp200);
+   Condicao3 := (ValorMACD > 0);
+   SinalCompra := ((Condicao1 = Verdadeiro) e (Condicao2 = Verdadeiro) e (Condicao3 = Verdadeiro) e (time < 1700));
+   SinalVenda := ((Condicao1 = Falso) e (Condicao2 = Falso) e (Condicao3 = Falso) e (time < 1700));
+   valor_LossCompra := BuyPrice - Range;
+   valor_lossVenda := SellPrice + Range;
+   LossCompra := (Fechamento < valor_LossCompra);
+   LossVenda := (Fechamento > valor_lossVenda);
+   
+   Se (IsSold) então
+    Inicio
+      Se (LossCompra = Verdadeiro) então
+        BuyToCoverAtMarket
+      Senão Se (close > HILOACTIVATOR(33)) ou (Time > 1740) então
+        BuyToCoverAtMarket;
+    fim
+  Senão Se (IsBought) então
+    Inicio
+      Se (LossVenda = Verdadeiro) então
+        SellToCoverAtMarket 
+      Senão Se (close < HILOACTIVATOR(33)) ou (Time > 1740) então
+        SellToCoverAtMarket;
+    fim
+  Senão  
+      Inicio
+         Se ( (SinalCompra = Verdadeiro)  ) então
+            BuyAtMarket
+         Senão Se ( (SinalVenda = Verdadeiro) )  então
+          SellShortAtMarket;
+      Fim;
+Fim;

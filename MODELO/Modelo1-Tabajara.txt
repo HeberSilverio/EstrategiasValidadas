@@ -1,0 +1,58 @@
+
+var
+SinalCompra : boolean;
+SinalVenda : boolean;
+LossCompra : boolean;
+LossVenda : boolean;
+valor_LossCompra, valor_lossVenda : float;
+ValorMACD : float;
+MediaExp21 : float;
+MediaExp50 : float;
+MediaExp200 : float;
+Condicao1 : boolean;
+Condicao2 : boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;
+
+Inicio
+   SinalCompra := (Fechamento > Fechamento[1]) e (Fechamento > Media(21,Close)) e (Media(21,Close) > Media(21,Close)[1]);
+   SinalVenda := (Fechamento < Fechamento[1]) e (Fechamento < Media(21,Close)) e (Media(21,Close) < Media(21,Close)[1]);
+   valor_LossCompra := BuyPrice - Range;
+   valor_lossVenda := SellPrice + Range;
+   LossCompra := (Fechamento < valor_LossCompra);
+   LossVenda := (Fechamento > valor_lossVenda);
+   ValorMACD := MACD(130,19,19)|1|;
+   MediaExp21 := (MediaExp(21,close));
+   MediaExp50 := (MediaExp(50,close));
+   MediaExp200 := (MediaExp(200,close));
+   Condicao1 := (MediaExp21 > MediaExp50);
+   Condicao2 := (MediaExp21 < MediaExp50);
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   StopGainCompra := ((Maxima - pCompra) >= 300);  
+   StopGainVenda := ((pVenda - Minima) >= 300); 
+
+   Se (IsSold)  então
+      Inicio
+         Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+               BuyToCoverAtMarket(1)
+         Senão Se ( (SinalCompra = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought)  então
+      Inicio
+         Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+               SellToCoverAtMarket(1) 
+         Senão Se ( (SinalVenda = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+            SellToCoverAtMarket;
+      fim
+   Senão 
+      Inicio
+         Se ( (Condicao1 = Verdadeiro) e (ValorMACD > 0) e (SinalCompra = Verdadeiro) e (time < 1700) ) então
+            BuyAtMarket
+         Senão Se ((Condicao2 = Verdadeiro) e (ValorMACD < 0) e (SinalVenda = Verdadeiro) e (time < 1700) )  então
+            SellShortAtMarket;
+      Fim;
+Fim;

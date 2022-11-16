@@ -1,0 +1,6 @@
+Inicio
+  Se (Fechamento > Fechamento[1]) e (Fechamento > Media(21,Close)) e (Media(21,Close) > Media(21,Close)[1]) então
+    PaintBar(clVerde)
+  Senão Se (Fechamento < Fechamento[1]) e (Fechamento < Media(21,Close)) e (Media(21,Close) < Media(21,Close)[1]) então
+    PaintBar(clVermelho);
+Fim;
