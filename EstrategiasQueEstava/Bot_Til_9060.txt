@@ -1,0 +1,29 @@
+Inicio
+   Inicio
+      Se (Fechamento > TILSON(0.45,9)[1]) então
+         PaintBar(clVerde)
+      Senão Se (Fechamento < TILSON(0.45,9)[1]) então
+         PaintBar(clMarrom);
+   fim;
+   
+   Se (IsSold) então
+      Inicio
+         Se (Fechamento > TILSON(0.45,9)[1]) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         Se (Fechamento < TILSON(0.45,9)[1]) então
+            SellToCoverAtMarket;
+      fim
+   Senão
+      Inicio
+         Se (Fechamento > TILSON(0.45,9)[1]) então
+            BuyAtMarket
+         Senão Se (Fechamento < TILSON(0.45,9)[1]) então
+            SellShortAtMarket;
+      Fim;
+
+      // Plotar o RSI no gráfico
+   Plot(TILSON(0.45,9));
+Fim;
