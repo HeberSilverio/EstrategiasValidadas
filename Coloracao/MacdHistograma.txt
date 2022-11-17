@@ -9,6 +9,6 @@ ValorMACD : float;
 begin
    ValorMACD := MACD(130,19,19)|1|;
 
-   if (ValorMACD > 0) then PaintBar(clVerde);
+   if (ValorMACD > 0) then PaintBar(clVerde)
    else if (ValorMACD < 0) then PaintBar(clMarrom);
 end;

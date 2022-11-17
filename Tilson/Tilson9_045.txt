@@ -1,0 +1,54 @@
+
+var
+SinalCompra : boolean;
+SinalVenda : boolean;
+LossCompra : boolean;
+LossVenda : boolean;
+valor_LossCompra, valor_lossVenda : float;
+ValorMACD : float;
+TilsonCompra : boolean;
+TilsonVenda : boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;
+
+Inicio
+   TilsonCompra := (Fechamento > Fechamento[1]) e (Fechamento > TILSON(0.45,9)) e (TILSON(0.45,9) > TILSON(0.45,9)[1]);
+   TilsonVenda := (Fechamento < Fechamento[1]) e (Fechamento < TILSON(0.45,9)) e (TILSON(0.45,9) < TILSON(0.45,9)[1]);
+   valor_LossCompra := BuyPrice - Range;
+   valor_lossVenda := SellPrice + Range;
+   LossCompra := (Fechamento < valor_LossCompra);
+   LossVenda := (Fechamento > valor_lossVenda);
+   ValorMACD := MACD(130,19,19)|1|;
+   SinalCompra := (TilsonCompra = Verdadeiro) e (ValorMACD > 0);
+   SinalVenda := (TilsonVenda = Verdadeiro) e (ValorMACD < 0);
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   StopGainCompra := ((Maxima - pCompra) >= 590);  
+   StopGainVenda := ((pVenda - Minima) >= 590); 
+   
+   Se (IsSold) então
+      Inicio
+         Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+            BuyToCoverAtMarket(1)   
+         Senão Se ( (SinalCompra = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought) então
+      Inicio
+         Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+            SellToCoverAtMarket(1) 
+         Senão Se ( (SinalVenda = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+            SellToCoverAtMarket;
+      fim
+   Senão
+      Inicio
+         Se( (SinalCompra = Verdadeiro) e (time < 1700) ) então
+            BuyAtMarket
+         Senão Se ( (SinalVenda = Verdadeiro) e (time < 1700) ) então
+            SellShortAtMarket;
+      Fim;
+   
+   Plot(TILSON(0.45,9));
+Fim;

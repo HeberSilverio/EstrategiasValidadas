@@ -1,0 +1,52 @@
+////////////////////////////////////////////////
+//  MACD HISTOGRAMA  //  DESENVOLVIDO POR: HÉBER SILVÉRIO //
+////////////////////////////////////////////////
+
+
+var
+ValorMACD : float;
+SinalCompra : boolean;
+SinalVenda : boolean;
+LossCompra : boolean;
+LossVenda : boolean;
+valor_LossCompra, valor_lossVenda : float;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;   
+
+begin
+   SinalCompra := (ValorMACD[1] < 0) e (ValorMACD > 0);
+   SinalVenda := (ValorMACD[1] > 0) e (ValorMACD < 0);
+   valor_LossCompra := BuyPrice - Range;
+   valor_lossVenda := SellPrice + Range;
+   LossCompra := (Fechamento < valor_LossCompra);
+   LossVenda := (Fechamento > valor_lossVenda);
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   StopGainCompra := ((Maxima - pCompra) >= 10);  
+   StopGainVenda := ((pVenda - Minima) >= 10); 
+   ValorMACD := MACD(130,19,19)|1|;
+
+   Se (IsSold)  então
+      Inicio
+         Se (StopGainVenda = Verdadeiro) então
+            BuyToCoverAtMarket
+         Senão Se ( (SinalCompra = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+            BuyToCoverAtMarket;
+      fim
+   Senão Se (IsBought)  então
+      Inicio
+         Se (StopGainCompra = Verdadeiro) então
+            SellToCoverAtMarket
+         Senão Se ( (SinalVenda = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+            SellToCoverAtMarket;
+      fim
+   Senão 
+      Inicio
+         Se ( (SinalCompra = Verdadeiro) e (time < 1700) ) então
+            BuyAtMarket
+         Senão Se ( (SinalVenda = Verdadeiro) e (time < 1700) )  então
+            SellShortAtMarket;
+      Fim;
+end;
