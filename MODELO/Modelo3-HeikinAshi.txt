@@ -1,0 +1,32 @@
+
+var
+hC,hO : Real;
+SinalCompra : boolean;
+SinalVenda : boolean;
+ValorHilo : float;
+
+Inicio
+   
+   hO := HeikinAshi(1,0)|0|;
+   hC := HeikinAshi(1,0)|1|;
+   SinalCompra := ((hC > hO) e (close > HILOACTIVATOR(9)) e (time < 1700));
+   SinalVenda := ((hC < hO) e (close < HILOACTIVATOR(9)) e (time < 1700));
+   
+  Se (IsSold) então
+    Inicio
+      Se (SinalCompra = Verdadeiro)  então
+        BuyToCoverAtMarket;
+    fim
+  Senão Se (IsBought) então
+    Inicio
+      Se (SinalVenda = Verdadeiro) então
+        SellToCoverAtMarket; 
+    fim
+  Senão 
+    Inicio
+      Se ( (SinalCompra = Verdadeiro) ) então
+        BuyAtMarket
+      Senão Se ( (SinalVenda = Verdadeiro) )  então
+        SellShortAtMarket;
+    Fim;
+Fim;
