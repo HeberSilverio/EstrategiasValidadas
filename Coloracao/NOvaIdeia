@@ -1,0 +1,33 @@
+var
+SinalCompra : boolean;
+SinalVenda : boolean;
+ValorHilo : float;
+hC,hO : Real;
+DistanciaHiloCompra : boolean;
+DistanciaHiloVenda : boolean;
+Condicao1 : boolean;
+Condicao2 : boolean;
+
+Inicio
+   hO := HeikinAshi(1,0)|0|;
+   hC := HeikinAshi(1,0)|1|;
+   ValorHilo := (HILOACTIVATOR(15));
+   DistanciaHiloCompra := ((Fechamento - ValorHilo) < 350);
+   DistanciaHiloVenda := ((ValorHilo - Fechamento) < 350);
+   SinalCompra := ((hC > hO) e (close > ValorHilo) e (DistanciaHiloCompra = Verdadeiro) );
+   SinalVenda := ((hC < hO) e (close < ValorHilo) e (DistanciaHiloVenda = Verdadeiro) );  
+   Condicao1 := (Fechamento > Fechamento[1]);// e (Fechamento > TILSON(0.60,15)) e (TILSON(0.60,15) > TILSON(0.50,15)[4]);
+   Condicao2 := (Fechamento < Fechamento[1]);// e (Fechamento < TILSON(0.60,15)) e (TILSON(0.60,15) < TILSON(0.50,15)[4]); 
+
+
+   Se ((Condicao1 = Verdadeiro) e (SinalCompra = Verdadeiro) e (time > 0905) e (time < 1700) ) então
+      PaintBar(clVerdeLimao)
+   Senão Se ((Condicao2 = Verdadeiro) e (SinalVenda = Verdadeiro) e (time > 0905) e (time < 1700) ) então
+      PaintBar(clVermelho)
+   Senão Se (close > ValorHilo) então
+      PaintBar(clTeal)
+   Senão Se (close < ValorHilo) então
+      PaintBar(clCinzaEscuro);
+Fim;
+
+

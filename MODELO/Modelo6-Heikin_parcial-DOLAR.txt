@@ -13,16 +13,16 @@ DistanciaHiloVenda : boolean;
 
 Inicio
    ValorHilo := (HILOACTIVATOR(21));
-   DistanciaHiloCompra := ((Fechamento - ValorHilo) < 650);
-   DistanciaHiloVenda := ((ValorHilo - Fechamento) < 650);
+   DistanciaHiloCompra := ((Fechamento - ValorHilo) < 16);
+   DistanciaHiloVenda := ((ValorHilo - Fechamento) < 16);
    hO := HeikinAshi(1,0)|0|;
    hC := HeikinAshi(1,0)|1|;
    SinalCompra := ((hC > hO) e (close > HILOACTIVATOR(21)) e (DistanciaHiloCompra = Verdadeiro) );
    SinalVenda := ((hC < hO) e (close < HILOACTIVATOR(21)) e (DistanciaHiloVenda = Verdadeiro) );
    pCompra := BuyPrice;
    pVenda := SellPrice;
-   StopGainCompra := ((Maxima - pCompra) >= 300);  
-   StopGainVenda := ((pVenda - Minima) >= 300); 
+   StopGainCompra := ((Maxima - pCompra) >= 10);  
+   StopGainVenda := ((pVenda - Minima) >= 10); 
    
   Se (IsSold) então
     Inicio

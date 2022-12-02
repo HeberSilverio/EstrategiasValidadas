@@ -6,9 +6,9 @@ Inicio
   hO := HeikinAshi(1,0)|0|;
   hC := HeikinAshi(1,0)|1|;
   
-  Se (hC > hO)  então
+  Se (hC > hO) e (close > HILOACTIVATOR(9)) então
     PaintBar(clVerde)
-  Senão Se (hC < hO) então 
+  Senão Se (hC < hO) e (close < HILOACTIVATOR(9)) então 
     PaintBar(clVermelho);
 
 Fim;

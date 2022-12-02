@@ -1,19 +1,17 @@
 var
 SinalCompra : boolean;
 SinalVenda : boolean;
-ValorMACD : float;
 TilsonCompra : boolean;
 TilsonVenda : boolean;
 
 Inicio
-   TilsonCompra := (Fechamento > Fechamento[1]) e (Fechamento > TILSON(0.45,9)) e (TILSON(0.45,9) > TILSON(0.45,9)[1]);
-   TilsonVenda := (Fechamento < Fechamento[1]) e (Fechamento < TILSON(0.45,9)) e (TILSON(0.45,9) < TILSON(0.45,9)[1]);
-   ValorMACD := MACD(130,19,19)|1|;
-   SinalCompra := (TilsonCompra = Verdadeiro) e (ValorMACD > 0);
-   SinalVenda := (TilsonVenda = Verdadeiro) e (ValorMACD < 0);
+   TilsonCompra := (Fechamento > Fechamento[1]) e (Fechamento > TILSON(0.45,9)) e (TILSON(0.45,9) > TILSON(0.45,9)[3]);
+   TilsonVenda := (Fechamento < Fechamento[1]) e (Fechamento < TILSON(0.45,9)) e (TILSON(0.45,9) < TILSON(0.45,9)[3]);
+   SinalCompra := (TilsonCompra = Verdadeiro);
+   SinalVenda := (TilsonVenda = Verdadeiro);
 
-  Se (SinalCompra = Verdadeiro) e (time < 1700)  então
+  Se (SinalCompra = Verdadeiro) e (time > 1003) e (time < 1700)  então
     PaintBar(clVerde)
-  Senão Se (SinalVenda = Verdadeiro) e (ValorMACD < 0) então
+  Senão Se (SinalVenda = Verdadeiro) e (time > 1003) e (time < 1700) então
     PaintBar(clMarrom);
 Fim;
