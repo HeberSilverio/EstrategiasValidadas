@@ -45,4 +45,6 @@ Inicio
       Senão Se ( (SinalVenda = Verdadeiro) e (time < 1700) )  então
         SellShortAtMarket;
     Fim;
+    if (Time >= 1750) and isBought then ClosePosition;
+    if (Time >= 1750) and isSold then ClosePosition;
 Fim;

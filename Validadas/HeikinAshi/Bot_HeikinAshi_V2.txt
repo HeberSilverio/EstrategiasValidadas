@@ -114,29 +114,36 @@ var
      if ((hC < hO) e (close < HILOACTIVATOR(21)) e (DistanciaHiloVenda = Verdadeiro) ) then
          SinalVenda := True;
 
-    Se (IsSold) então
+     if (GraphicInterval <> itRenko) then
+        //if LastBarOnChart then 
+        plotText("Mudar para renko!", clVermelho, -1, 12);
+   
+   Se (IsSold) então
       Inicio
-        Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
-              BuyToCoverAtMarket(1);
-        Se ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) então
+      Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+            BuyToCoverAtMarket(1);
+      Se ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) então
             BuyToCoverAtMarket
-        Senão Se ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) então
-           BuyToCoverAtMarket;
+      Senão Se ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) então
+         BuyToCoverAtMarket;
       fim
-    Senão Se (IsBought) então
+   Senão Se (IsBought) então
       Inicio
-        Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
-              SellToCoverAtMarket(1); 
-        Se ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) então
+      Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+            SellToCoverAtMarket(1); 
+      Se ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) então
             SellToCoverAtMarket
-        Senão Se ( (SinalVenda = Verdadeiro) ou (Time > 1750) ) então
-           SellToCoverAtMarket;
+      Senão Se ( (SinalVenda = Verdadeiro) ou (Time > 1750) ) então
+         SellToCoverAtMarket;
       fim
-    Senão 
+   Senão 
       Inicio
-        Se ( (SinalCompra = Verdadeiro)  e (time < 1700)  ) então
-          BuyAtMarket
-        Senão Se ( (SinalVenda = Verdadeiro) e (time < 1700) )  então
-          SellShortAtMarket;
+      Se ( (SinalCompra = Verdadeiro)  e (time < 1700)  ) então
+         BuyAtMarket
+      Senão Se ( (SinalVenda = Verdadeiro) e (time < 1700) )  então
+         SellShortAtMarket;
       Fim;
-  Fim;
+      if (Time >= 1630) and isBought then ClosePosition;
+      if (Time >= 1630) and isSold then ClosePosition;
+
+Fim;
