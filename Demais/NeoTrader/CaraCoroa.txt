@@ -1,0 +1,103 @@
+const
+ //Relação risco/ganho de 3:1
+ cStopEmTicks = 10;
+ cAlvoEmTicks = 30;
+ cStopOffsetEmTicks = 50;
+
+input
+  bGestaoDeRiscoPelaEstrategia(true);
+  iHorarioInicioAberturaPosicao(0905);
+  iHorarioFimAberturaPosicao(1630);
+  iHorarioEncerramentoDaytrade(1645);
+
+var
+  iCaraCoroa: integer;
+  bSinalCompra, bSinalVenda, bPosicionado: boolean;
+  fPrecoStop, fPrecoAlvo, fPrecoStopOffset: float;
+
+begin
+
+  bSinalCompra := false;
+  bSinalVenda := false;
+  bPosicionado := hasPosition;
+
+  //ESTRATÉGIA CARA OU COROA!
+  //Gera um numero aleatorio de 0 a 9. Se for menor igual a 4, gera
+  //sinal de compra, se for maior que 4 geral sinal de venda
+  if Not bPosicionado
+  and (Time >= iHorarioInicioAberturaPosicao)
+  and (Time <= iHorarioFimAberturaPosicao)
+  then
+  begin
+    //Número aleatório foi substituido por minuto par ou impar para permitir depurar
+    //melhor o robô quando a estratégia é inserida multiplas vezes: como indicador  e como execução
+    //iCaraCoroa := Random(10);
+    iCaraCoroa := mod(Time,2);
+    if iCaraCoroa = 0 then bSinalCompra := true
+    else bSinalVenda := true;
+  end;
+
+
+  //Gera ordem de compra a mercado quando há um Sinal de COMPRA
+  //e define ordem stoploss e take profit
+  if bSinalCompra then BuyAtMarket;
+
+  //Gera ordem de venda a mercado quando há um Sinal de VENDA
+  //e define ordem stoploss e take profit
+  if bSinalVenda then SellShortAtMarket;
+
+  if bGestaoDeRiscoPelaEstrategia then
+  begin
+    //POSIÇÃO COMPRADA
+    //Código responsável pela manutenção das ordens de stoploss e take profit
+    if isBought then
+    begin
+      fPrecoStop := BuyPrice - cStopEmTicks*MinPriceIncrement;
+      fPrecoAlvo := BuyPrice + cAlvoEmTicks*MinPriceIncrement;
+      fPrecoStopOffset := fPrecoStop - cStopOffsetEmTicks*MinPriceIncrement;
+
+      SellShortStop(fPrecoStop,fPrecoStopOffset);
+      if isBought then SellShortLimit(fPrecoAlvo);
+    end;
+
+    //POSIÇÃO VENDIDA
+    //Código responsável pela manutenção das ordens de stoploss e take profit
+    if isSold then
+    begin
+      fPrecoStop := SellPrice + cStopEmTicks*MinPriceIncrement;
+      fPrecoAlvo := SellPrice - cAlvoEmTicks*MinPriceIncrement;
+      fPrecoStopOffset := fPrecoStop + cStopOffsetEmTicks*MinPriceIncrement;
+
+      BuyStop(fPrecoStop,fPrecoStopOffset);
+      if isSold then BuyLimit(fPrecoAlvo);
+    end;
+
+    //Encerra posicao
+    if (Time >= iHorarioEncerramentoDaytrade)
+    and HasPosition
+    then ClosePosition;
+
+
+  end;
+
+  // Plot de Stop e Alvo para inspeção visual do código
+  bPosicionado := hasPosition;
+  if bPosicionado or bPosicionado[1] or bPosicionado[2] then
+  begin
+    PlotN(1,fPrecoStop);
+    PlotN(2,fPrecoStopOffset);
+    PlotN(3,fPrecoAlvo);
+    SetPlotColor(1,clRed);
+    SetPlotColor(2,clRed);
+    SetPlotColor(3,clGreen);
+    SetPlotStyle(1,psDash);
+    SetPlotStyle(2,psDash);
+    SetPlotStyle(3,psDash);
+    SetPlotWidth(1,2);
+    SetPlotWidth(2,2);
+    SetPlotWidth(3,2);
+
+end;
+
+
+end;
