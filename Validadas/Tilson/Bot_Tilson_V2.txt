@@ -1,6 +1,8 @@
 // #########################################################################
 // #########################################################################
 // #########################################################################
+// ######          TILSON        TILSON      TILSON     TILSON       #######
+// ######                                                            #######
 // ######                            O                               #######
 // ######                        ____|____                           #######
 // ######                      _|         |_                         #######
@@ -36,7 +38,7 @@
 // ---------------------- DADOS DA ESTRATÉGIA ----------------------------
 // -----------------------------------------------------------------------
 //
-//  NOME DA ESTRATÉGIA: Bot_HeikinAshi
+//  NOME DA ESTRATÉGIA: Bot_Tilson_V2
 //    DESENVOLVIDA POR: Héber Silvério
 //     DATA DE CRIAÇÃO: 01/11/2022
 //              VERSÃO: 1.0
@@ -45,7 +47,7 @@
 //                      ( ) Screening  ( ) Texto     ( ) Alarme
 //
 // DESCRIÇÃO DA ESTRATÉGIA:
-//      Esta estratégia considera HeikinAshi e Hilo para tomada de decisão
+//      Esta estratégia considera Média Tilson para tomada de decisão
 //
 //  MELHOR PERFORMANCE:
 //    Ativo: WINFUT
@@ -53,97 +55,71 @@
 // -----------------------------------------------------------------------
 //
 // ######################### FIM DO CABEÇALHO ############################
-//
-// -----------------------------------------------------------------------
-// -------------------------- Constantes ---------------------------------
-// OBS:
-// -----------------------------------------------------------------------
-//const
-//
-// ---------------------------------------------------------------------
-// -------------------------- Parâmetros -------------------------------
-// OBS: Segue abaixo a descriação de cada parâmetro
-// 1) pLimiteSobreComprado -> Limite no qual considera-se que o cruzamento
-// para baixo gere uma operação de venda
-// 2) pLimiteSobreVendido -> Limite no qual considera-se que o cruzamento
-// para cima gere uma operação de compra
-// 3) pTamanhoPosicao -> Tamanho da exposição ao ativo
-// ---------------------------------------------------------------------
-//input
-// ---------------------------------------------------------------------
-// ---------------------- Variáveis globais ----------------------------
-// OBS:
-// ---------------------------------------------------------------------
 var
-  hC,hO : real;
-  SinalCompra : boolean;
-  SinalVenda : boolean;
-  ValorHilo : float;
-  StopGainCompra : boolean;
-  StopGainVenda : boolean;
-  StopLossCompra : boolean;
-  StopLossVenda : boolean;
-  pCompra : float;
-  pVenda : float;
-  DistanciaHiloCompra : boolean;
-  DistanciaHiloVenda : boolean;
+SinalCompra : boolean;
+SinalVenda : boolean;
+LossCompra : boolean;
+LossVenda : boolean;
+valor_LossCompra, valor_lossVenda : float;
+TilsonCompra : boolean;
+TilsonVenda : boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+StopLossCompra : boolean;
+StopLossVenda : boolean;
+pCompra : float;
+pVenda : float;
 
-  Inicio
-     ValorHilo := (HILOACTIVATOR(21));
-     DistanciaHiloCompra := ((Fechamento - ValorHilo) < 600);
-     DistanciaHiloVenda := ((ValorHilo - Fechamento) < 600);
-     hO := HeikinAshi(1,0)|0|;
-     hC := HeikinAshi(1,0)|1|;
-     SinalCompra := False;
-     SinalVenda := False;
-     StopLossCompra := False;
-     StopLossVenda := False;
-     pCompra := BuyPrice;
-     pVenda := SellPrice;
-     StopGainCompra := ((Maxima - pCompra) >= 500);  
-     StopGainVenda := ((pVenda - Minima) >= 500); 
+Inicio
+   StopLossCompra := False;
+   StopLossVenda := False;
 
-      Se (hC < hO) e (close > HILOACTIVATOR(21)) então
-         StopLossCompra := True;
-      Se (hC > hO) e (close < HILOACTIVATOR(21)) então 
-         StopLossVenda := True;
-     
-     if ((hC > hO) e (close > HILOACTIVATOR(21)) e (DistanciaHiloCompra = Verdadeiro) ) then
-         SinalCompra := True;
+   Se (Fechamento < Fechamento[1]) e (Fechamento > TILSON(0.45,9)) e (TILSON(0.45,9) > TILSON(0.45,9)[1]) então
+      StopLossCompra := True;
+   Se (Fechamento > Fechamento[1]) e (Fechamento < TILSON(0.45,9)) e (TILSON(0.45,9) < TILSON(0.45,9)[1]) então
+      StopLossVenda := True;
 
-     if ((hC < hO) e (close < HILOACTIVATOR(21)) e (DistanciaHiloVenda = Verdadeiro) ) then
-         SinalVenda := True;
+   TilsonCompra := (Fechamento > Fechamento[1]) e (Fechamento > TILSON(0.45,9)) e (TILSON(0.45,9) > TILSON(0.45,9)[1]);
+   TilsonVenda := (Fechamento < Fechamento[1]) e (Fechamento < TILSON(0.45,9)) e (TILSON(0.45,9) < TILSON(0.45,9)[1]);
 
-     if (GraphicInterval <> itRenko) or (GraphicOffset <> 25) then
-        //if LastBarOnChart then 
-        plotText("Mudar para renko!", clVermelho, -1, 12);
+
+   valor_LossCompra := BuyPrice - (range * 0.9);
+   valor_lossVenda := SellPrice + (range * 0.9);
+   LossCompra := (Fechamento < valor_LossCompra);
+   LossVenda := (Fechamento > valor_lossVenda);
+   SinalCompra := (TilsonCompra = Verdadeiro);
+   SinalVenda := (TilsonVenda = Verdadeiro);
+   
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   StopGainCompra := ((Maxima - pCompra) >= 195);  
+   StopGainVenda := ((pVenda - Minima) >= 195); 
+
    
    Se (IsSold) então
       Inicio
-      Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
-            BuyToCoverAtMarket(1);
-      Se ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) então
+         Se (SellPosition = 2) and (StopGainVenda = Verdadeiro) então
+            BuyToCoverAtMarket(1);   
+         Se ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) então
             BuyToCoverAtMarket
-      Senão Se ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) então
-         BuyToCoverAtMarket;
+         Senão Se ( (SinalCompra = Verdadeiro) ou (LossVenda = Verdadeiro) ou (Time > 1740) ) então
+            BuyToCoverAtMarket;
       fim
    Senão Se (IsBought) então
       Inicio
-      Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
-            SellToCoverAtMarket(1); 
-      Se ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) então
-            SellToCoverAtMarket
-      Senão Se ( (SinalVenda = Verdadeiro) ou (Time > 1750) ) então
-         SellToCoverAtMarket;
+         Se (BuyPosition = 2) and (StopGainCompra = Verdadeiro) então
+            SellToCoverAtMarket(1);
+         Se ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) então
+            SellToCoverAtMarket 
+         Senão Se ( (SinalVenda = Verdadeiro) ou (LossCompra = Verdadeiro) ou (Time > 1740) ) então
+            SellToCoverAtMarket;
       fim
-   Senão 
+   Senão
       Inicio
-      Se ( (SinalCompra = Verdadeiro)  e (time < 1700)  ) então
-         BuyAtMarket
-      Senão Se ( (SinalVenda = Verdadeiro) e (time < 1700) )  então
-         SellShortAtMarket;
+         Se( (SinalCompra = Verdadeiro) e (time < 1700) ) então
+            BuyAtMarket
+         Senão Se ( (SinalVenda = Verdadeiro) e (time < 1700) ) então
+            SellShortAtMarket;
       Fim;
-      if (Time >= 1750) and isBought then ClosePosition;
-      if (Time >= 1750) and isSold then ClosePosition;
-
+   
 Fim;
