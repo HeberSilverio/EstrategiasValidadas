@@ -4,12 +4,15 @@
 
 //MELHOR PERFORMANCE 
 // DOL 4R - 70x30 - Fator de lucro 1,80
+input
+   LinhaInferior(20);
+   LinhaSuperior(80);
 
    // Verifica a regra e colore se esta sobrecomprado ou sobrevendido
 begin
-   if (RSI(9, 0) > 70) then PaintBar(clVerde);
-   if (RSI(9, 0) < 30) then PaintBar(clMarrom);
-   if ( (RSI(9, 0) < 70) and (RSI(9, 0) > 30) ) then PaintBar(clCinzaEscuro);
+   if (RSI(9, 0) > LinhaSuperior) then PaintBar(clVerde);
+   if (RSI(9, 0) < LinhaInferior) then PaintBar(clMarrom);
+   if ( (RSI(9, 0) < LinhaSuperior) and (RSI(9, 0) > LinhaInferior) ) then PaintBar(clCinzaEscuro);
 
       // Plotar o RSI no gráfico
    Plot(RSI(9, 0));

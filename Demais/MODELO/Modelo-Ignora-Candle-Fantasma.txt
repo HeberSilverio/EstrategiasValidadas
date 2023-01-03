@@ -1,0 +1,46 @@
+var
+  bLocalizouBoxesGap : boolean;
+  iDataUltimoBox, iUltimoBoxDiaAnterior, iBoxDeGAP: integer;
+begin
+
+  // Código é aplicável apenas à gráficos do tipo Renko
+  if GraphicInterval = itRenko then
+  begin
+    // Identificação de Box relacionados a GAP
+    if Date <> iDataUltimoBox then
+    begin
+      iUltimoBoxDiaAnterior := CurrentBar - 1;
+      iBoxDeGAP := CurrentBar;
+      bLocalizouBoxesGap := false;
+    end;
+
+   iDataUltimoBox := Date;
+
+   if Not bLocalizouBoxesGap then
+    if BarDurationF = 0 then
+    begin
+      iBoxDeGAP := CurrentBar;
+      PaintBar(clRed);
+    end
+    else
+    begin
+      //Aqui foi identificado o primeiro box que não é de GAP
+      bLocalizouBoxesGAP := true;
+    end;
+
+
+    //Aqui executa a estratégia em boxes que não são devido à
+    //gap de abertura
+    if bLocalizouBoxesGAP then
+    begin
+      PaintBar(clGreen);
+    end;
+
+
+
+  end
+  // O Gráfico não é do tipo Renko!
+  else
+    if LastBarOnChart then PlotText("Aplicável apenas a Renko",clWhite,-1,10);
+
+end

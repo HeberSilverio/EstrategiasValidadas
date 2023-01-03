@@ -1,0 +1,30 @@
+input
+   Periodo(100);
+   //DesvioSuperior(2,10);
+   //DesvioInferior(2,10);
+   pQuantDesvio(2.10);
+var
+   ValorDoCanal : float;
+   CanalSuperior : float;
+   CanalInferior : float;
+   SinalCompra : boolean;
+   SinalVenda : boolean;
+begin
+   ValorDoCanal := LinearRegressionChannel(Periodo, true, pQuantDesvio, true, pQuantDesvio);
+   CanalSuperior := (LinearRegressionChannel(Periodo, true, 2, true, 2)|1|);
+   CanalInferior := (LinearRegressionChannel(Periodo, true, 2, true, 2)|2|);
+   
+   SinalCompra := (Fechamento > CanalInferior) and (Fechamento[1] < CanalInferior);
+   SinalVenda := (Fechamento < CanalSuperior) and (Fechamento[1] > CanalSuperior);
+
+   if (SinalCompra = Verdadeiro) then 
+      PaintBar(clVerde);
+   if (SinalVenda = Verdadeiro) then 
+      PaintBar(clMarrom);
+
+   //Plot(CanalSuperior);
+   //Plot2(CanalInferior);
+   Plot(LinearRegressionChannel(Periodo, true, 2, true, 2)|1|);
+   Plot2(LinearRegressionChannel(Periodo, true, 2, true, 2)|2|);
+
+end;
