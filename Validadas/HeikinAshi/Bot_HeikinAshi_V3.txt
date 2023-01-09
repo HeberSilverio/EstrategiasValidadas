@@ -71,8 +71,8 @@ var
 
   Inicio
      ValorHilo := (HILOACTIVATOR(21));
-     DistanciaHiloCompra := ((Fechamento - ValorHilo) < 600);
-     DistanciaHiloVenda := ((ValorHilo - Fechamento) < 600);
+     DistanciaHiloCompra := ((Fechamento - ValorHilo) < 720);
+     DistanciaHiloVenda := ((ValorHilo - Fechamento) < 720);
      hO := HeikinAshi(1,0)|0|;
      hC := HeikinAshi(1,0)|1|;
      SinalCompra := False;
