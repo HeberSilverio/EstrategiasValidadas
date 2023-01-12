@@ -1,0 +1,36 @@
+
+Parametro
+Lucro(125);
+Prejuizo (25);
+Amplitude (400);
+
+var
+compra : boolean;
+venda : boolean;
+TP, SL : real;
+A, F, Mx, Mn, L, P, Am: real;
+
+Inicio
+
+A:= Abertura;
+F:= Fechamento;
+Mx:= Maxima;
+Mn:= Minima;
+
+L:= Lucro;
+P:= Prejuizo;
+Am:= Amplitude;
+
+Se (Time > 0910) então inicio;
+
+   inicio;
+
+ compra := (f > A);
+
+
+Se (compra = verdadeiro) e Not(IsBought) então
+   BuyLimit(abertura);
+   TP := (abertura +L);
+   SL := (abertura -P);
+   SellToCoverLimit(TP);
+   SellToCoverStop(SL,SL);

@@ -1,0 +1,40 @@
+Parametro
+Lucro(125);
+Prejuizo (25);
+Amplitude (400);
+
+var
+compra : boolean;
+venda : boolean;
+TP, SL : real;
+A, F, Mx, Mn, L, P, Am: real;
+
+Inicio
+
+A:= Abertura;
+F:= Fechamento;
+Mx:= Maxima;
+Mn:= Minima;
+
+L:= Lucro;
+P:= Prejuizo;
+Am:= Amplitude;
+
+//Se (Time > 0910) então 
+
+
+
+//C_Mx1_BCC
+compra := (F > A) e (F[1] > A[1]) e (Vwap(0) < F) e (Vwap(0) > A) e ((Mx - Mn) <= 400) e (((Mx[1])/2)<=400);
+
+//V9_50_BCV
+//venda := (f<A)e(F[1]<A[1])e (Vwap(0)>F)e (Vwap(0)<A)e(Vwap(0)[1]>F[1])e (Vwap(0)[1]<A[1])e(((Mx+Mn)/2)<=400);
+
+Se (compra = verdadeiro) então
+  // BuyLimit(Mx[1]);
+  // TP := Mx[1] + L ;
+  // SL := Mx[1] - P ;
+  // SellToCoverLimit(TP);
+  // SellToCoverStop(SL,SL);
+  PaintBar(clVerde);
+Fim;

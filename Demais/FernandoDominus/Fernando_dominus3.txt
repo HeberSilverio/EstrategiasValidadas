@@ -1,0 +1,9 @@
+
+compra:= e(f>Mx[1])e (F[1]>A[1]) e (Vwap(0)<F)
+
+Se (compra = verdadeiro) e Not(IsBought)
+   BuyLimit(Mx[1]-5);
+   TP := (Mx[1]-5) + L ;
+   SL := (Mx[1]-5) - P ;
+   SellToCoverLimit(TP);
+   SellToCoverStop(SL,SL);

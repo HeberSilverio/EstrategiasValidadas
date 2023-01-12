@@ -1,0 +1,170 @@
+//-----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+//  NOME DA ESTRATÉGIA: Bot_Only_Joy
+//    DESENVOLVIDA POR: Héber Silvério
+//     DATA DE CRIAÇÃO: 02/01/2023
+//              VERSÃO: 4.0
+//       ATUALIZADA EM: 11/01/2023
+//  TIPO DE ESTRATÉGIA: ( ) Indicador  (x) Coloração (X) Execução
+//                      ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//      Esta estratégia considera o índice de força relativa lenta (SRSI) criado por Vitali Apirine
+//      
+//  MELHOR PERFORMANCE:
+//    Ativo: WINFUT
+//  Periodo: Acima de 16 renko
+//  HISTÓRIA: 
+// - Parametros (periodo18 - Suavização12)
+// - Não dar sinal de venda acima de 90
+// - Não dar sinal de compra abaixo de 10
+// - Stop Inicial de um range completo
+// - Encerrar apenas se der sinal no sentido contrário e candle anterior for na mesma direção
+// - no 16r compensa fazer parcial de 200pts
+//  
+//  (Periodo de teste 01-11-2022 a 29-12-2022)
+// -----------------------------------------------------------------------
+Input
+Stop(500);
+Parcial(700);
+ContratosPosicao(2);
+ContratosParcial(1);
+StopMovelApartir(500);
+//--Only_Joy
+  Período(18);
+  Suavização(12);
+  Preço(close);
+  NívelSobrecompra(90);
+  NívelIntermediario(50);
+  NívelSobrevenda(10);
+//--
+var
+
+//--Only_Joy
+   MA_s              : float;
+   r1,r2,r3,r4,r5,rr : float;
+   MA_s2             : float;
+//--
+   
+SinalCompra: boolean;
+SinalVenda: boolean;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;
+LossCompra : boolean;
+LossVenda : boolean;
+valor_LossCompra, valor_lossVenda : float;
+Subindo, Descendo : boolean;
+StopMovelCompra : boolean;
+StopMovelVenda : boolean;
+
+begin
+   //--Only_Joy
+   r1 := mediaexp(Período,Preço);
+   if Preço > r1 then
+      r2 := Preço - r1
+   else 
+      r2 := 0;
+   if Preço < r1 then
+      R3 := r1 - Preço
+   else 
+      R3 := 0;
+   MA_s := (r2 + (MA_s[1] * (Suavização - 1))) / Suavização;
+   r4 := MA_s;
+   MA_s2 := (r3 + (MA_s2[1] * (Suavização - 1))) / Suavização;
+   r5 := MA_s2;
+   if r5 = 0 then
+      rr := 100
+   else 
+      rr := 100 - (100 / (1 + (r4 / r5)));
+   //--
+   StopGainCompra := False;
+   StopGainVenda := False;
+   SinalCompra := False;
+   SinalVenda := False;
+   StopMovelCompra := False;
+   StopMovelVenda := False;
+   
+   Subindo := (Fechamento[0] > Abertura[0]) e (Fechamento[1] > Abertura[1]);
+   Descendo := (Fechamento[0] < Abertura[0]) e (Fechamento[1] < Abertura[1]);
+
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   
+   if ((Maxima - pCompra) > Parcial) then
+      StopGainCompra := True;
+   if ((pVenda - Minima) > Parcial) then
+      StopGainVenda := True;
+
+   //Stop movel a partir de 500   
+   if ((Maxima - pCompra) > StopMovelApartir) e (High[2] > High[3]) and (High[1] > High[2]) then
+      StopMovelCompra := True;
+   if ((pVenda - Minima) > StopMovelApartir) e (Low[2] < Low[3]) and (Low[1] < Low[2]) then
+      StopMovelVenda := True;
+
+   valor_LossCompra := Low + (range * 0.4);
+   //valor_LossCompra := BuyPrice - (Stop);
+   LossCompra := (Fechamento < valor_LossCompra) e ((Maxima - pCompra) < Stop);
+
+   valor_lossVenda := High - (range * 0.4);
+   //valor_lossVenda := SellPrice + (Stop);
+   LossVenda := (Fechamento > valor_lossVenda) e ((pVenda - Minima) < Stop);
+
+   if (rr > rr[1]) e (rr > NívelSobrevenda)  then
+      SinalCompra := True;
+   if (rr < rr[1]) e (rr < NívelSobrecompra)  then
+      SinalVenda := True; 
+
+
+   Se (IsSold) então
+      Inicio
+         Se (SellPosition = ContratosPosicao) and (StopGainVenda = Verdadeiro) então
+               BuyToCoverAtMarket(ContratosParcial);
+         Se ( (LossVenda = Verdadeiro) ou (Time > 1750) ) então
+               BuyToCoverAtMarket;
+         //condição contrária
+         Se (SinalCompra = Verdadeiro) e (Subindo = Verdadeiro) então
+               BuyToCoverAtMarket
+         Senão Se (StopMovelVenda = Verdadeiro) então
+               BuyToCoverStop(High[3]);
+      fim;
+      
+   Se (IsBought) então
+      Inicio
+         Se (BuyPosition = ContratosPosicao) and (StopGainCompra = Verdadeiro) então
+               SellToCoverAtMarket(ContratosParcial); 
+         Se ( (LossCompra = Verdadeiro) ou (Time > 1750) ) então
+               SellToCoverAtMarket;
+            //condição contrária
+         Se (SinalVenda = Verdadeiro) e (Descendo = Verdadeiro) então
+              SellToCoverAtMarket
+         Senão Se (StopMovelCompra = Verdadeiro) então
+              SellToCoverStop(Low[3]);
+      fim;
+      
+   Se (BuyPosition = 0) e (SellPosition = 0) e (Time < 1740) então 
+      Inicio
+         Se (SinalCompra = Verdadeiro) e (Subindo = Verdadeiro) então
+         Inicio
+            BuyAtMarket(ContratosPosicao);
+         Fim;
+         
+         Se (SinalVenda = Verdadeiro) e (Descendo = Verdadeiro) então
+         Inicio
+            SellShortAtMarket(ContratosPosicao);
+         Fim;
+      Fim;
+
+   if (Time >= 1759) and isBought then ClosePosition;
+   if (Time >= 1759) and isSold then ClosePosition;
+
+   //Coloração
+   if (SinalCompra = Verdadeiro) e (Subindo = Verdadeiro) e (Time < 1740) then 
+      PaintBar(clVerde);
+   if (SinalVenda = Verdadeiro) e (Descendo = Verdadeiro) e (Time < 1740) then 
+      PaintBar(clMarrom);
+
+end;
