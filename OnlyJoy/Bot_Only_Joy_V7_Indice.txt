@@ -14,7 +14,7 @@
 //      Esta estratégia considera o índice de força relativa lenta (SRSI) criado por Vitali Apirine
 //      
 //  MELHOR PERFORMANCE:
-//    Ativo: DOLFUT
+//    Ativo: WINFUT
 //  Periodo: Acima de 16 renko
 //  HISTÓRIA: 
 // - Parametros (periodo18 - Suavização12)
@@ -22,18 +22,20 @@
 // - Não dar sinal de compra abaixo de 10
 // - Stop Inicial de um range completo
 // - Encerrar apenas se der sinal no sentido contrário e candle anterior for na mesma direção
-// - no 6r compensa fazer parcial de 7pts
-//  
+// - no 18r compensa fazer parcial de 150pts
+// - no 25r compensa fazer parcial de 200pts
+// - Resolvi o problema da lateralidade de apenas um candle, agora entra na virada seguinte se o indicador permitir 
+//  (Periodo de teste 01-11-2022 a 29-12-2022)
 // -----------------------------------------------------------------------
 Input
-Stop(7.5);
-Parcial(7);
+Stop(500);
+Parcial(200);
 ContratosPosicao(2);
 ContratosParcial(1);
-StopMovelApartir(5);
+StopMovelApartir(500);
 //--Only_Joy
-  Período(6);
-  Suavização(6);
+  Período(12);
+  Suavização(12);
   Preço(close);
   NívelSobrecompra(90);
   NívelIntermediario(50);
