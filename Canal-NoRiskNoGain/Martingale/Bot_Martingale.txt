@@ -1,0 +1,38 @@
+Input
+Alvo(50.00);
+ContratosEntrada(2);
+Multiplicador(3);
+
+Var
+CtoReversao : Inteiro;
+
+Inicio
+
+   Se (IsBought) então
+      Inicio
+         CtoReversao := BuyPosition+(BuyPosition*Multiplicador); //Tamanho da minha posição
+
+         Se (Fechamento < Abertura) então
+            SellShortAtMarket(CtoReversao);
+         
+         SellToCoverLimit(BuyPrice+Alvo);
+      Fim;
+
+   Se (IsSold) então
+      Inicio
+         CtoReversao := SellPosition+(SellPosition*Multiplicador);
+         Se (Fechamento > Abertura) então
+         BuyAtMarket(CtoReversao);
+
+         BuyToCoverLimit(SellPrice-Alvo);
+      Fim;
+   
+   Se (HasPosition = False) então
+   Inicio
+      Se (Fechamento > Abertura) então
+         BuyAtMarket(ContratosEntrada);
+      
+      Se (Fechamento < Abertura) então
+         SellShortAtMarket(ContratosEntrada);
+   Fim;
+Fim;

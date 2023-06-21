@@ -1,0 +1,31 @@
+Input
+TamanhoBarra(120);
+VolumeElef(600);
+Pavio(40);
+
+Var
+ElefC, ElefV, PavioC, PavioV : Float;
+
+Inicio
+   ElefC := Fechamento - Minima;
+   ElefV := ABS(Fechamento - Maxima);//Função ABS onde captura apenas o valor absoluto, ele vai desconsiderar o sinal desta operação matemática.
+   PavioC := Maxima - Fechamento;
+   PavioV := ABS(Minima - Fechamento);
+
+
+   Se (HasPosition = False) então
+      Inicio
+         Se (ElefC > TamanhoBarra) e (Fechamento > Abertura) e (PavioC < Pavio) e (Volume > (VolumeElef*1000000)) então
+         Inicio
+         BuyAtMarket; 
+         PaintBar(ClGreen);
+         Fim;
+
+         Se (ElefV > TamanhoBarra) e (Fechamento < Abertura) e (PavioV < Pavio) e (Volume > (VolumeElef*1000000)) então
+            Inicio
+            SellShortAtMarket; 
+            PaintBar(ClRed);
+            Fim;
+      Fim;
+   
+Fim;

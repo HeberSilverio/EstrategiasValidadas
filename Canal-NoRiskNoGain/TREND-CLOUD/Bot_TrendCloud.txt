@@ -1,0 +1,70 @@
+//Para criar robos para forex utilize o true range para entender a escala de preço
+//True Range - para ver o tamanho das barras coloque no período 10
+// Para colocar preenchimento no indicador que estamos criando: Clica com botão direito em propriedade do indicador que criamos, em preenchimento marca preenchimento e ok.
+
+//Posso utilizar a Flag para definir a quantidade de entradas
+
+Input
+Alvo(50);
+Stop(50);
+Contratos(1);
+FatorCurto(0.38);
+PeriodoCurto(4);
+FatorLonga(0.55);
+PeriodoLonga(15);
+
+HoraInicio(0900);
+HoraFim(1750);
+
+Var
+TilsonCurto, TilsonLonga : Float;
+FlagCompra, FlagVenda : Inteiro;
+
+
+Inicio
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga);
+
+   SetPlotColor(1, clYellow);
+   SetPlotColor(2, clGray);
+   SetPlotColor(3, clGreen);
+   
+   //Indicador Trend-Cloud
+   Se (TilsonCurto > TilsonLonga) then PaintBar(clBlue)
+   Senão PaintBar(clMarrom);
+   Plot4(TilsonCurto);
+   Plot5(TilsonLonga);
+
+   //Extratégia de execução
+
+   //Limpa a Flag
+   Se (Fechamento < TilsonCurto) então FlagCompra := 0;
+   Se (Fechamento > TilsonCurto) então FlagVenda := 0;
+
+   Se (IsBought) então
+       Inicio
+         FlagCompra := 1;
+         SellToCoverLimit(BuyPrice+Alvo, Contratos); //Alvo
+         SellToCoverStop(BuyPrice-Stop, BuyPrice-Stop-100, Contratos);//Stop
+      Fim; 
+   
+   Se (IsSold) então
+     Inicio
+         FlagVenda := 1;
+         BuyToCoverLimit(SellPrice-Alvo, Contratos);//Alvo
+         BuyToCoverStop(SellPrice+Stop+100, Contratos);//Stop
+      Fim; 
+
+   Se (HasPosition = False) e (Time > HoraInicio) e (Time < HoraFim) então
+      Inicio
+         //Compra
+         Se (Fechamento > TilsonCurto) e (Fechamento > TilsonLonga) e (Fechamento > Abertura) e (FlagCompra = 0) então
+            BuyAtMarket;
+         
+         //Venda
+         Se (Fechamento < TilsonCurto) e (Fechamento < TilsonLonga) e (Fechamento < Abertura) e (FlagVenda = 0) então
+            SellShortAtMarket;
+      Fim;
+   Se (Time > 1745) então ClosePosition;
+   
+Fim;

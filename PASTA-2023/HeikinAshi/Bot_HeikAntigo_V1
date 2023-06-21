@@ -1,0 +1,57 @@
+Input
+vHilo(33);
+DistanciaHilo(920);
+EntradaPermiteAteHora(1700);
+FecharPositaHora(1750);
+StopGainPTS(500);
+ContratosPosicao(2);
+ContratosParcial(1);
+var
+hC,hO : Real;
+SinalCompra : boolean;
+SinalVenda : boolean;
+ValorHilo : float;
+StopGainCompra : boolean;
+StopGainVenda : boolean;
+pCompra : float;
+pVenda : float;
+DistanciaHiloCompra : boolean;
+DistanciaHiloVenda : boolean;
+
+Inicio
+   ValorHilo := (HILOACTIVATOR(vHilo));
+   DistanciaHiloCompra := ((Fechamento - ValorHilo) < DistanciaHilo);
+   DistanciaHiloVenda := ((ValorHilo - Fechamento) < DistanciaHilo);
+   hO := HeikinAshi(1,0)|0|;
+   hC := HeikinAshi(1,0)|1|;
+   SinalCompra := ((hC > hO) e (close > HILOACTIVATOR(21)) e (DistanciaHiloCompra = Verdadeiro) );
+   SinalVenda := ((hC < hO) e (close < HILOACTIVATOR(21)) e (DistanciaHiloVenda = Verdadeiro) );
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   StopGainCompra := ((Maxima - pCompra) >= StopGainPTS);  
+   StopGainVenda := ((pVenda - Minima) >= StopGainPTS); 
+   
+  Se (IsSold) então
+    Inicio
+      Se (SellPosition = ContratosPosicao) and (StopGainVenda = Verdadeiro) então
+            BuyToCoverAtMarket(ContratosParcial)
+      Senão Se ( (SinalCompra = Verdadeiro) ou (Time > FecharPositaHora) ) então
+         BuyToCoverAtMarket;
+   fim
+  Senão Se (IsBought) então
+    Inicio
+      Se (BuyPosition = ContratosPosicao) and (StopGainCompra = Verdadeiro) então
+            SellToCoverAtMarket(ContratosParcial) 
+      Senão Se ( (SinalVenda = Verdadeiro) ou (Time > FecharPositaHora) ) então
+         SellToCoverAtMarket;
+   fim
+  Senão 
+    Inicio
+      Se ( (SinalCompra = Verdadeiro)  e (time < EntradaPermiteAte)  ) então
+        BuyAtMarket
+      Senão Se ( (SinalVenda = Verdadeiro) e (time < EntradaPermiteAte) )  então
+        SellShortAtMarket;
+    Fim;
+    if (Time >= FecharPositaHora) and isBought then ClosePosition;
+    if (Time >= FecharPositaHora) and isSold then ClosePosition;
+Fim;

@@ -1,0 +1,50 @@
+Input
+Desvio(2);
+Periodo(20);
+Contratos(1);
+OffSet(90);
+AlvoFibo(1.00);
+Var
+
+BandaSuperiorV, BandaInferiorC, StopC, AlvoC, StopV, AlvoV : Float;
+
+Inicio
+   BandaSuperiorV := BollingerBands(Desvio, Periodo, 0)|0|;
+   BandaInferiorC := BollingerBands(Desvio, Periodo, 0)|1|;
+
+
+   Se (IsSold) então
+     Inicio
+         BuyToCoverLimit(SellPrice-AlvoV*AlvoFibo, Contratos);//Alvo
+         BuyToCoverStop(StopV, StopV+500);//Stop
+      Fim;  
+
+   Se (IsBought) então
+       Inicio
+         SellToCoverLimit(BuyPrice+AlvoC*AlvoFibo, Contratos); //Alvo
+
+         SellToCoverStop(StopC, StopC-500);//Stop
+      Fim; 
+
+   Se (HasPosition = False) então	
+   Inicio
+   //condição da venda
+     Se (Fechamento[1] > BandaSuperiorV) e (Fechamento < BandaSuperiorV) então
+       Inicio
+         SellShortStop(Minima-MinPriceIncrement, Minima-MinPriceIncrement-OffSet, Contratos);
+         StopV := Maxima+MinPriceIncrement;
+         AlvoV := (Maxima-Minima)+2*MinPriceIncrement;
+         PaintBar(ClRed);
+       Fim;
+
+   //condição da compra
+     Se (Fechamento[1] < BandaInferiorC) e (Fechamento > BandaInferiorC) então
+      Inicio
+         BuyStop(Maxima+MinPriceIncrement, Maxima+MinPriceIncrement+OffSet, Contratos);
+         StopC := Minima-MinPriceIncrement;
+         AlvoC := (Maxima-Minima)+2*MinPriceIncrement;
+         PaintBar(ClGreen);
+      Fim; 
+
+   Fim;
+Fim;

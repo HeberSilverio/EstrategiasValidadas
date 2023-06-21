@@ -1,0 +1,99 @@
+// -----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+//  NOME DA ESTRATÉGIA: Bot_HeikinAshi
+//    DESENVOLVIDA POR: Héber Silvério
+//     DATA DE CRIAÇÃO: 01/11/2022
+//              VERSÃO: 3.0
+//       ATUALIZADA EM: 07/12/2022
+//  TIPO DE ESTRATÉGIA: ( ) Indicador  ( ) Coloração (X) Execução
+//                      ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//      Esta estratégia considera HeikinAshi e Hilo para tomada de decisão
+//
+//  MELHOR PERFORMANCE:
+//    Ativo: WINFUT
+//  Periodo: 25 renko
+// -----------------------------------------------------------------------
+//
+// ######################### FIM DO CABEÇALHO ############################
+//
+// -----------------------------------------------------------------------
+Input
+DistanciaHilo(720);
+
+var
+  hC,hO : real;
+  SinalCompra : boolean;
+  SinalVenda : boolean;
+  ValorHilo : float;
+  StopLossCompra : boolean;
+  StopLossVenda : boolean;
+  pCompra : float;
+  pVenda : float;
+  DistanciaHiloCompra : boolean;
+  DistanciaHiloVenda : boolean;
+
+Inicio
+   ValorHilo := (HILOACTIVATOR(21));
+   DistanciaHiloCompra := ((Fechamento - ValorHilo) < DistanciaHilo);
+   DistanciaHiloVenda := ((ValorHilo - Fechamento) < DistanciaHilo);
+   hO := HeikinAshi(1,0)|0|;
+   hC := HeikinAshi(1,0)|1|;
+   SinalCompra := False;
+   SinalVenda := False;
+   StopLossCompra := False;
+   StopLossVenda := False;
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+
+   if (hC < hO) e (close > HILOACTIVATOR(21)) then
+         StopLossCompra := True;
+   if (hC > hO) e (close < HILOACTIVATOR(21)) then 
+      StopLossVenda := True;
+   
+   if ((hC > hO) e (close > HILOACTIVATOR(21)) e (DistanciaHiloCompra = Verdadeiro) ) then
+      Inicio
+      SinalCompra := True;
+      PaintBar(ClGreen);
+      Fim;
+
+   if ((hC < hO) e (close < HILOACTIVATOR(21)) e (DistanciaHiloVenda = Verdadeiro) ) then
+      Inicio
+      SinalVenda := True;
+      PaintBar(ClRed);
+      Fim;
+
+   Se (IsBought) então
+      Inicio
+         if ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) then
+            SellToCoverAtMarket
+         else if ( (SinalVenda = Verdadeiro) ou (Time > 1750) ) then
+            SellToCoverAtMarket;
+      Fim;
+   Se (IsSold) então
+      Inicio
+         if ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) then
+            BuyToCoverAtMarket
+         else Se ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) then
+            BuyToCoverAtMarket;
+      Fim;
+
+   Se (HasPosition = False) então
+    Inicio
+      if ( (SinalCompra = Verdadeiro)  e (time < 1700)  ) then
+         Inicio
+            BuyAtMarket;
+            PaintBar(ClGreen);
+         Fim;
+      
+      if ( (SinalVenda = Verdadeiro) e (time < 1700) )  then
+         Inicio
+            SellShortAtMarket;
+            PaintBar(ClRed);
+         Fim;
+
+    Fim;
+Fim;

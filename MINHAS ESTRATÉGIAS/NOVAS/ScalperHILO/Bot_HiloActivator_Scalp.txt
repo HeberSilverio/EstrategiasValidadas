@@ -1,0 +1,24 @@
+Input
+PeriodoHilo(3);
+
+Var
+ValorHilo : float;
+
+Inicio
+   ValorHilo := (HILOACTIVATOR(PeriodoHilo));
+
+   Se (HasPosition = False) então
+      Inicio
+         Se (Fechamento < Abertura) e (Fechamento > ValorHilo) e (Time > 0903) então
+           Inicio
+              BuyAtMarket;
+              PaintBar(ClGreen);
+           Fim;
+         Se (Fechamento > Abertura) e (Fechamento < ValorHilo) e (Time > 0903) então
+           Inicio
+              SellShortAtMarket;
+              PaintBar(ClRed);
+           Fim;
+      Fim;
+
+Fim;

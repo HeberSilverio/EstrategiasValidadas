@@ -1,0 +1,33 @@
+Input
+vHilo(11);
+DistanciaHilo(600);
+EntradaPermiteAte(1700);
+var
+hC,hO : Real;
+SinalCompra : boolean;
+SinalVenda : boolean;
+ValorHilo : float;
+
+pCompra : float;
+pVenda : float;
+DistanciaHiloCompra : boolean;
+DistanciaHiloVenda : boolean;
+
+Inicio
+   ValorHilo := (HILOACTIVATOR(vHilo));
+   DistanciaHiloCompra := ((Fechamento - ValorHilo) < DistanciaHilo);
+   DistanciaHiloVenda := ((ValorHilo - Fechamento) < DistanciaHilo);
+   hO := HeikinAshi(1,0)|0|;
+   hC := HeikinAshi(1,0)|1|;
+   SinalCompra := ((hC > hO) e (close > HILOACTIVATOR(vHilo)) e (DistanciaHiloCompra = Verdadeiro) );
+   SinalVenda := ((hC < hO) e (close < HILOACTIVATOR(vHilo)) e (DistanciaHiloVenda = Verdadeiro) );
+   pCompra := BuyPrice;
+   pVenda := SellPrice;
+   
+   
+   if ((SinalCompra = Verdadeiro) e (time < EntradaPermiteAte)  ) then 
+        PaintBar(clVerde); 
+   if ((SinalVenda = Verdadeiro) e (time < EntradaPermiteAte) )  then
+        PaintBar(clVermelho);
+    
+Fim;

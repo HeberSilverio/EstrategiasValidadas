@@ -1,0 +1,37 @@
+// Grafico 5 min e 1 min
+// Gráfico de Heiken Ashi
+// Stop ATR Period 1 ATR Multiplier 1.85  para sinal
+// 1- IFR Period 100 Cor branca
+// 2- IFR Period 25  Cor Amarela
+// Teremos cruzamento de IFR
+
+var
+  hC,hO : real;
+
+Inicio
+//Cores pagina 21 - clBlack  clGreen clOlive clNavy clPurple clTeal clGray clSilver  clLime clYellow
+   SetPlotColor(1, clYellow);
+   SetPlotColor(2, clGray);
+   SetPlotColor(3, clLime);
+   SetPlotColor(4, clBlue);
+   SetPlotColor(5, clRed);
+   SetPlotColor(6, clWhite);
+   SetPlotColor(7, clMarrom);
+
+   hO := HeikinAshi(1,0)|0|;
+   hC := HeikinAshi(1,0)|1|;
+
+   if (hC[1] > hO[1]) e (hC > hO) then
+     Inicio
+       PaintBar(ClGreen);      
+     fim;
+   if (hC[1] < hO[1]) e (hC < hO) then
+     Inicio
+       PaintBar(clBlue);
+     Fim;
+  
+   //Plot(RSI(50, 0));
+   //Plot2(RSI(100, 0));
+   Plot3(hC);
+   Plot4(hO);
+Fim;

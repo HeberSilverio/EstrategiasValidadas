@@ -1,0 +1,23 @@
+Input
+
+Var
+
+Inicio
+   Se (IsSold) então
+   Inicio
+      //Alvo
+      //Stop
+   Fim;
+
+   Se (IsBought) então
+   Inicio
+      //Alvo
+      //Stop
+   Fim;
+
+   Se (HasPosition = False) então	
+   Inicio
+   //condição da venda
+   //condição da compra
+   Fim;
+Fim;

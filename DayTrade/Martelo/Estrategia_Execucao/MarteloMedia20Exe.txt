@@ -1,0 +1,76 @@
+//declarando as variáveis
+var
+   sinal_compra : boolean;
+   sinal_venda : boolean;
+   valor_gain, valor_loss : float;
+
+begin
+
+   //PARTE 1 - capturando sinal para abrir posição
+   sinal_compra := ((Fechamento > Abertura) e (Minima < Abertura[1]) e (Fechamento > MediaExp(20,Close)[1]));
+   
+
+   Se (Fechamento > MediaExp(20,Close)[1]) então
+      PaintBar(clVerde)
+   Senão Se (Fechamento < MediaExp(20,Close)[1]) então
+      PaintBar(clMarrom);  
+
+   //PARTE 2 - se acontece o sinal de compra e eu não estou posicionado
+
+   //se acontece o sinal de compra e eu não estou comprado
+   se (sinal_compra = Verdadeiro) e Not(IsBought) então
+         begin
+            //deixar evidente que o sinal aconteceu com coloração
+            PaintBar(clVerdeLimão);
+            //executar uma ordem de compra a mercado;
+            BuyAtMarket;
+            //calcular valores de gain e de loss;
+            valor_gain := High + Range;
+            valor_loss := Low;
+            //inserir ordens de venda para fechar posição (ToCover, se comportam exatamente como uma OCO!)
+            SellToCoverLimit(valor_gain); //gain é uma ordem de venda limite
+            SellToCoverStop(valor_loss,valor_loss); //stop é uma ordem de venda stop 
+         end;
+
+   se IsBought então
+         begin
+            //continuar inserindo ordens de venda para fechar posição (ToCover, se comportam exatamente como uma OCO!)
+            SellToCoverLimit(valor_gain); //gain é uma ordem de venda limite
+            SellToCoverStop(valor_loss,valor_loss); //stop é uma ordem de venda stop
+
+            //prevenção contra gaps, executar a mercado caso a ordem de loss tenha sido pulada
+            se Low < valor_loss então SellToCoverAtMarket;
+         end;
+
+
+      //////////   VENDA /////////////////
+      //PARTE 1 - capturando sinal para abrir posição
+        sinal_venda :=  (Fechamento < Abertura) e (Maxima > Abertura[1]) e (Fechamento < MediaExp(20,Close)[1]);
+      
+        //PARTE 2 - se acontece o sinal de venda e eu não estou posicionado
+      
+        //se acontece o sinal de Venda e eu não estou vendido
+        se (sinal_venda = Verdadeiro) e Not(IsSold) então
+            begin
+               PaintBar(clVermelho);
+               //executar uma ordem de venda a mercado;
+               SellShortAtMarket;
+               //calcular valores de gain e de loss;
+               valor_gain := Mínima - Range;
+               valor_loss := High;
+               //inserir ordens de venda para fechar posição (ToCover, se comportam exatamente como uma OCO!)
+               BuyToCoverLimit(valor_gain); //gain é uma ordem de compra limite
+               BuyToCoverStop(valor_loss,valor_loss); //stop é uma ordem de compra stop 
+            end;
+      
+        se IsSold então
+            begin
+               //continuar inserindo ordens de compra para fechar posição (ToCover, se comportam exatamente como uma OCO!)
+               BuyToCoverLimit(valor_gain); //gain é uma ordem de compra limite
+               BuyToCoverStop(valor_loss,valor_loss); //stop é uma ordem de compra stop  
+      
+               //prevenção contra gaps, executar a mercado caso a ordem de loss tenha sido pulada
+               se High > valor_loss então BuyAtMarket;
+            end;
+      
+end;

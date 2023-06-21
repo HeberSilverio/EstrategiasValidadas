@@ -1,0 +1,137 @@
+
+// -----------------------------------------------------------------------
+// ---------------------- DADOS DA ESTRATÉGIA ----------------------------
+// -----------------------------------------------------------------------
+//
+//  NOME DA ESTRATÉGIA: Bot_HeikinAshi
+//    DESENVOLVIDA POR: Héber Silvério
+//     DATA DE CRIAÇÃO: 01/11/2022
+//              VERSÃO: 4.0
+//       ATUALIZADA EM: 15/01/2023
+//  TIPO DE ESTRATÉGIA: ( ) Indicador  ( ) Coloração (X) Execução
+//                      ( ) Screening  ( ) Texto     ( ) Alarme
+//
+// DESCRIÇÃO DA ESTRATÉGIA:
+//      Esta estratégia considera HeikinAshi e Hilo para tomada de decisão
+//
+//  MELHOR PERFORMANCE:
+//    Ativo: WINFUT
+//  Periodo: 25 renko
+// -----------------------------------------------------------------------
+//
+// ######################### FIM DO CABEÇALHO ############################
+//
+// -----------------------------------------------------------------------
+Input
+Stop(500);
+//Parcial(200);
+//ContratosPosicao(2);
+//ContratosParcial(1);
+//StopMovelApartir(500);
+//--Only_Joy
+  Período(12);
+  Suavização(12);
+  Preço(close);
+  NívelSobrecompra(95);
+  NívelIntermediario(50);
+  NívelSobrevenda(5);
+//--
+var
+//--Only_Joy
+   MA_s              : float;
+   r1,r2,r3,r4,r5,rr : float;
+   MA_s2             : float;
+//--
+  hC,hO : real;
+  SinalCompra : boolean;
+  SinalVenda : boolean;
+  ValorHilo : float;
+  StopLossCompra : boolean;
+  StopLossVenda : boolean;
+  pCompra : float;
+  pVenda : float;
+  //DistanciaHiloCompra : boolean;
+  //DistanciaHiloVenda : boolean;
+
+  Inicio
+  //--Only_Joy
+   r1 := mediaexp(Período,Preço);
+   if Preço > r1 then
+      r2 := Preço - r1
+   else 
+      r2 := 0;
+   if Preço < r1 then
+      R3 := r1 - Preço
+   else 
+      R3 := 0;
+   MA_s := (r2 + (MA_s[1] * (Suavização - 1))) / Suavização;
+   r4 := MA_s;
+   MA_s2 := (r3 + (MA_s2[1] * (Suavização - 1))) / Suavização;
+   r5 := MA_s2;
+   if r5 = 0 then
+      rr := 100
+   else 
+      rr := 100 - (100 / (1 + (r4 / r5)));
+   //--
+
+     ValorHilo := (HILOACTIVATOR(33));
+     //DistanciaHiloCompra := ((Fechamento - ValorHilo) < 720);
+     //DistanciaHiloVenda := ((ValorHilo - Fechamento) < 720);
+     hO := HeikinAshi(1,0)|0|;
+     hC := HeikinAshi(1,0)|1|;
+     SinalCompra := False;
+     SinalVenda := False;
+     StopLossCompra := False;
+     StopLossVenda := False;
+     pCompra := BuyPrice;
+     pVenda := SellPrice;
+
+      if (hC < hO) e (close > HILOACTIVATOR(33)) then
+         StopLossCompra := True;
+      if (hC > hO) e (close < HILOACTIVATOR(33)) then 
+         StopLossVenda := True;
+
+     
+     if ((hC > hO) e (rr > rr[1]) e (rr > NívelSobrevenda) ) then
+         SinalCompra := True;
+
+     if ((hC < hO) e (rr < rr[1]) e (rr < NívelSobrecompra) ) then
+         SinalVenda := True;
+
+     if (GraphicInterval <> itRenko) or (GraphicOffset <> 25) then
+        //if LastBarOnChart then 
+        plotText("Mudar para renko!", clVermelho, -1, 12);
+   
+   if (IsSold) then
+      Inicio
+      
+      if ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) then
+            BuyToCoverAtMarket
+      else Se ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) then
+         BuyToCoverAtMarket;
+      fim
+   else if (IsBought) then
+      Inicio
+      
+      if ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) then
+            SellToCoverAtMarket
+      else if ( (SinalVenda = Verdadeiro) ou (Time > 1750) ) then
+         SellToCoverAtMarket;
+      fim
+   else 
+      Inicio
+      if ( (SinalCompra = Verdadeiro) e (close > HILOACTIVATOR(33)) e (time < 1730)  ) then
+         BuyAtMarket
+      else if ( (SinalVenda = Verdadeiro) e (close < HILOACTIVATOR(33)) e (time < 1730) )  then
+         SellShortAtMarket;
+      Fim;
+      if (Time >= 1759) and isBought then ClosePosition;
+      if (Time >= 1759) and isSold then ClosePosition;
+
+      //Coloração
+      if ( (SinalCompra = Verdadeiro) e (close > HILOACTIVATOR(33)) e (time < 1730)  ) then
+         PaintBar(clVerde);
+      if ( (SinalVenda = Verdadeiro) e (close < HILOACTIVATOR(33)) e (time < 1730) )  then
+         PaintBar(clMarrom);
+
+Fim;

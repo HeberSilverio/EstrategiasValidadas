@@ -1,0 +1,11 @@
+//Robo de gradiente
+//Inicia quando bate no vwap 0.4 para definir a tendência
+
+
+//Venda limit 1 485
+//Venda limit 1 435 
+//Comprado 2 em 410
+//Compra limit 1 335
+
+
+

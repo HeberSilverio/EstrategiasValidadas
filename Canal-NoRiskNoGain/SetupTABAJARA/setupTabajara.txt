@@ -1,0 +1,41 @@
+Input
+MediaTabajara(20);
+AlvoFibo(1.00);
+
+var
+MediaT, StopC, AlvoC, StopV, AlvoV : Float;
+
+Inicio
+   MediaT := Media(MediaTabajara, Fechamento);
+
+   Se (IsBought) então
+      Inicio
+         SellToCoverLimit(BuyPrice+AlvoC*AlvoFibo); //Alvo
+
+         SellToCoverStop(StopC, StopC-500);//Stop
+      Fim;
+   Se (IsSold) então
+      Inicio
+         BuyToCoverLimit(SellPrice-AlvoV*AlvoFibo);//Alvo
+         BuyToCoverStop(StopV, StopV+500);//Stop
+      Fim;
+
+   Se (HasPosition = False) então
+      Inicio
+         Se (MediaT > MediaT[1]) e (fechamento > Abertura) então
+            Inicio
+               BuyStop(Maxima+MinPriceIncrement, Maxima+MinPriceIncrement+90);
+               StopC := Minima-MinPriceIncrement;
+               AlvoC := (Maxima-Minima)+2*MinPriceIncrement;
+               PaintBar(ClGreen);
+            Fim;
+         
+         Se (MediaT < MediaT[1]) e (fechamento < Abertura) então
+            Inicio
+               SellShortStop(Minima-MinPriceIncrement, Minima-MinPriceIncrement-90);
+               StopV := Maxima+MinPriceIncrement;
+               AlvoV := (Maxima-Minima)+2*MinPriceIncrement;
+               PaintBar(ClRed);
+            Fim;
+      Fim;
+Fim;

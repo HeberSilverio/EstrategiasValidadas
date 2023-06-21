@@ -1,0 +1,45 @@
+Input
+MMExpPeriodo(2);
+PeriodoMinimas(2);
+PtsAbaixoMinima(30);
+PtsAcimaMedia(25);
+PtsParaCompra(40);
+PtsParaVenda(40);
+Var
+MediaExponencial, nUltimasDuasMinimas, CondicaoUm, CondicaoDois, PrecoOrdemCompra, PrecoOrdemVenda : Float;
+
+Begin
+   SetPlotColor(1, clYellow);
+   SetPlotColor(2, clGray);
+   SetPlotColor(3, clGreen);
+
+   MediaExponencial := MediaExp(MMExpPeriodo,Maxima);
+   nUltimasDuasMinimas := Lowest(Low, PeriodoMinimas)[1];
+   CondicaoUm := nUltimasDuasMinimas-PtsAbaixoMinima;
+   CondicaoDois := MediaExponencial+PtsAcimaMedia;
+   PrecoOrdemCompra := Fechamento-PtsParaCompra;
+   PrecoOrdemVenda := Fechamento+PtsParaVenda;
+   Se (Fechamento < CondicaoUm) então
+     Inicio
+       PaintBar(ClGreen);
+     Fim;
+   Se (Fechamento > MediaExponencial) então
+     Inicio
+        PaintBar(ClRed);
+     Fim;
+    
+   Se (HasPosition = False) então
+      Inicio
+         Se (Fechamento < CondicaoUm) e (Time > 0903) então
+           Inicio
+              BuyLimit(PrecoOrdemCompra);
+           Fim;
+         Se (Fechamento > MediaExponencial) e (Time > 0903) então
+           Inicio
+              SellShortLimit(PrecoOrdemVenda);
+           Fim;
+      Fim;
+
+   Plot(MediaExponencial);
+   Plot2(nUltimasDuasMinimas);
+End;               

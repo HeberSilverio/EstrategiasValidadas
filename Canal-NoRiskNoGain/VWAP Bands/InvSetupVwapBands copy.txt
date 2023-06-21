@@ -1,0 +1,218 @@
+//Esta funcionando no 10pt com OCO 100pts 
+
+Input
+Alvo(100);
+OffSet(90);
+Percentual(0.20);
+Contratos(1);
+
+Var
+Vwap1, Vwap2, Vwap3, VwapM1, VwapM2, VwapM3, AlvoV, AlvoC, StopV, StopC : Float;
+
+Inicio
+   
+   Vwap1 := Vwap(1) + (Vwap(1)*((Percentual*1)/100));
+   Vwap2 := Vwap(1) + (Vwap(1)*((Percentual*2)/100));
+   Vwap3 := Vwap(1) + (Vwap(1)*((Percentual*3)/100));
+   Vwap3 := Vwap(1) + (Vwap(1)*((Percentual*3)/100));
+   Vwap4 := Vwap(1) + (Vwap(1)*((Percentual*4)/100));
+   Vwap5 := Vwap(1) + (Vwap(1)*((Percentual*5)/100));
+   Vwap6 := Vwap(1) + (Vwap(1)*((Percentual*6)/100));
+   Vwap7 := Vwap(1) + (Vwap(1)*((Percentual*7)/100));
+   Vwap8 := Vwap(1) + (Vwap(1)*((Percentual*8)/100));
+   Vwap9 := Vwap(1) + (Vwap(1)*((Percentual*9)/100));
+   Vwap10 := Vwap(1) + (Vwap(1)*((Percentual*10)/100));
+
+   VwapM1 := Vwap(1) - (Vwap(1)*((Percentual*1)/100));
+   VwapM2 := Vwap(1) - (Vwap(1)*((Percentual*2)/100));
+   VwapM3 := Vwap(1) - (Vwap(1)*((Percentual*3)/100));
+   VwapM4 := Vwap(1) - (Vwap(1)*((Percentual*4)/100));
+   VwapM5 := Vwap(1) - (Vwap(1)*((Percentual*5)/100));
+   VwapM6 := Vwap(1) - (Vwap(1)*((Percentual*6)/100));
+   VwapM7 := Vwap(1) - (Vwap(1)*((Percentual*7)/100));
+   VwapM8 := Vwap(1) - (Vwap(1)*((Percentual*8)/100));
+   VwapM9 := Vwap(1) - (Vwap(1)*((Percentual*9)/100));
+   VwapM10 := Vwap(1) - (Vwap(1)*((Percentual*10)/100));
+
+
+   Se (IsSold) então
+     Inicio
+         BuyToCoverLimit(SellPrice-(AlvoV), Contratos);//Alvo
+         BuyToCoverStop(SellPrice+AlvoV, Contratos);//Stop
+      Fim;  
+
+   Se (IsBought) então
+       Inicio
+         SellToCoverLimit(BuyPrice+(AlvoC), Contratos); //Alvo
+         SellToCoverStop(100, 120, 1);//Stop
+      Fim; 
+
+
+
+   Se (HasPosition = False) então
+      Inicio
+         //Vwap Positiva
+         Se (Fechamento > Vwap(1)) e (Fechamento < Vwap1) então
+            Inicio
+               SellShortStop(Vwap(1));
+               BuyStop(Vwap1);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+         
+         Se (Fechamento > Vwap1) e (Fechamento < Vwap2) então
+            Inicio
+               SellShortStop(Vwap1);
+               BuyStop(Vwap2);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+         
+         Se (Fechamento > Vwap2) e (Fechamento < Vwap3) então
+            Inicio
+               SellShortStop(Vwap2);
+               BuyStop(Vwap3);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+         
+         Se (Fechamento > Vwap3) e (Fechamento < Vwap4)  então
+            Inicio
+               SellShortStop(Vwap3);
+               BuyStop(Vwap4);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim; 
+         
+         Se (Fechamento > Vwap4) e (Fechamento < Vwap5)  então
+            Inicio
+               SellShortStop(Vwap4);
+               BuyStop(Vwap5);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+
+         Se (Fechamento > Vwap5) e (Fechamento < Vwap6)  então
+            Inicio
+               SellShortStop(Vwap5);
+               BuyStop(Vwap6);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim; 
+         
+         Se (Fechamento > Vwap6) e (Fechamento < Vwap7)  então
+            Inicio
+               SellShortStop(Vwap6);
+               BuyStop(Vwap7);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+         
+         Se (Fechamento > Vwap7) e (Fechamento < Vwap8)  então
+            Inicio
+               SellShortStop(Vwap7);
+               BuyStop(Vwap8);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+         Se (Fechamento > Vwap8) e (Fechamento < Vwap9)  então
+            Inicio
+               SellShortStop(Vwap8);
+               BuyStop(Vwap9);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+         Se (Fechamento > Vwap9) e (Fechamento < Vwap10)  então
+            Inicio
+               SellShortStop(Vwap9);
+               BuyStop(Vwap10);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+
+         //Vwap Negativa
+         Se (Fechamento < Vwap(1)) e (Fechamento > VwapM1) então
+            Inicio
+               SellShortStop(VwapM1);
+               BuyStop(Vwap(1));
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+
+         Se (Fechamento < VwapM1) e (Fechamento > VwapM2) então
+            Inicio
+               SellShortStop(VwapM2);
+               BuyStop(VwapM1);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+         
+         Se (Fechamento < VwapM2) e (Fechamento > VwapM3) então
+            Inicio
+               SellShortStop(VwapM3);
+               BuyStop(VwapM2);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;
+         
+         Se (Fechamento < VwapM3) então
+            Inicio
+               SellShortStop(VwapM3);
+               //BuyStop(VwapM3);
+               AlvoV := SellPrice-Alvo;
+               StopV := SellPrice+Alvo;
+               AlvoC := BuyPrice+Alvo;
+               StopC := BuyPrice-Alvo;
+            Fim;  
+
+      Fim;
+
+   Plot(Vwap1);
+   Plot2(Vwap2);
+   Plot3(Vwap3);
+   Plot4(Vwap4);
+   Plot5(Vwap5);
+   Plot6(Vwap6);
+   Plot7(Vwap7);
+   Plot8(Vwap8);
+   Plot9(Vwap9);
+   Plot10(Vwap10);
+
+   Plot11(VwapM1);
+   Plot12(VwapM2);
+   Plot13(VwapM3);
+   Plot14(VwapM4);
+   Plot15(VwapM5);
+   Plot16(VwapM6);
+   Plot17(VwapM7);
+   Plot18(VwapM8);
+   Plot19(VwapM9);
+   Plot20(VwapM10);
+
+Fim;

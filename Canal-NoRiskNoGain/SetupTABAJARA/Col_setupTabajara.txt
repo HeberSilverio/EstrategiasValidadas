@@ -1,0 +1,20 @@
+Input
+MediaTabajara(20);
+
+var
+MediaT : Float;
+
+Inicio
+   MediaT := Media(MediaTabajara, Fechamento);
+
+   Se (MediaT > MediaT[1]) e (fechamento > Abertura) então
+      Inicio
+         PaintBar(ClGreen);
+      Fim;
+   
+   Se (MediaT < MediaT[1]) e (fechamento < Abertura) então
+      Inicio
+         PaintBar(ClRed);
+      Fim;
+
+Fim;

@@ -1,0 +1,101 @@
+//Dois blocos, um para tedencia de alta e outra para baixa
+//Comprar na direção da tendência tilson cruzamentos de média e aumentar posição até 4
+//Primeira compra Se (Tendência) E (TrueRange < 138) - Comprar apenas 1
+//A partir do segundo contrato (Tendência) E (TrueRange < 138) E (dist < 310) E (false 3 BOX F # T)
+//Compras Se (F<A BuyAtMarket) se (F>A BuyAtMarket) Se (Abertura Limit)
+//Alvo Scalp 3box-2tick (16Renko 215pts)
+//Stop dois Box (16Renko 150pts)
+//(Renko*Tick)-Tick = tamanho do box - 2tick
+//(16*5)-5 = (75*3) - 2Tick = 215
+//(6*0.5)-0.5 = (2,5*3) - 1 = 6,5 DOLAR
+
+Input
+Alvo(215);
+Stop(150);
+Contratos(1);
+FatorCurto(0.38);
+PeriodoCurto(4);
+FatorLonga(0.55);
+PeriodoLonga(15);
+EspacamentoMedias(310.0);
+
+HoraInicio(0900);
+HoraFim(1750);
+
+Var
+TilsonCurto, TilsonLonga, dist1, dist2, numberTrueRange : Float;
+FlagCompra, FlagVenda : Inteiro;
+SinalCompraUm, SinalCompraDois, SinalCompraTres : boolean;
+SinalVendaUm, SinalVendaDois, SinalVendaTres : boolean;
+distMenor310Um, distMenor310Dois, TrueRangeMenor138 : boolean;
+
+Inicio
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga);
+   numberTrueRange := AvgTrueRange(10, 0);
+   
+   SetPlotColor(1, clYellow);SetPlotColor(2, clWhite);SetPlotColor(3, clGreen);
+   //Plot(TilsonCurto); Plot2(TilsonLonga);
+
+   //Reseta variável
+   distMenor310Um := False;
+   distMenor310Dois := False;
+   SinalCompraUm := False;
+   SinalCompraDois := False;
+   SinalCompraTres := False;
+   SinalVendaUm := False;
+   SinalVendaDois := False;
+   SinalVendaTres := False;
+
+   //SE A TENDENCIA É DE ALTA
+   Se (TilsonCurto > TilsonLonga) e (Time < HoraFim) then 
+      Inicio
+         //PaintBar(clBlue);
+         dist1 := TilsonCurto - TilsonLonga;
+         if (dist1 < EspacamentoMedias) then Inicio distMenor310Um := True; Fim;
+         if (numberTrueRange < 138) e (Fechamento > Abertura) then Inicio SinalCompraUm := True; Fim;
+         
+         if (HasPosition = False) then 
+         Inicio
+           if (SinalCompraUm = True) then 
+             Inicio 
+               PaintBar(clGreen);
+               BuyAtMarket(Contratos); 
+             Fim;
+         Fim;
+         
+
+         if (distMenor310Um = True) e (numberTrueRange < 138) e (Fechamento < Abertura) then Inicio SinalCompraDois := True; Fim;
+         if (SinalCompraDois = True) then Inicio PaintBar(clVerdeLimao); Fim;
+
+         if (BuyPosition > 1) e (BuyPosition < 4) e (SinalCompraDois = True) then
+             Inicio 
+               //PaintBar(clVerdeLimao);
+               BuyAtMarket(Contratos); 
+             Fim;  
+
+         if (SinalCompraUm = True) ou (SinalCompraDois = True) then Inicio SinalCompraTres := True; Fim;
+         if (BuyPosition < 4) e (SinalCompraTres = True) then 
+         Inicio 
+           BuyLimit(Abertura+MinPriceIncrement, Contratos);
+         Fim;
+      Fim;
+
+
+      
+   //SE A TENDENCIA É DE BAIXA
+   Se (TilsonCurto < TilsonLonga) e (Time < HoraFim) then 
+   Inicio
+      //PaintBar(clMarrom);
+      dist2 := TilsonLonga - TilsonCurto;
+      if (dist2 < EspacamentoMedias) then Inicio distMenor310Dois := True; Fim;
+      if (numberTrueRange < 138) e (Fechamento < Abertura) then Inicio SinalVendaUm := True; Fim;
+      if (SinalVendaUm = True) then Inicio PaintBar(clYellow); Fim;
+   Fim;
+   
+
+   
+   Se (Time > 1745) então ClosePosition;
+   //if (HasPendingOrders = True) then Inicio CancelPendingOrders; Fim;
+   
+Fim;

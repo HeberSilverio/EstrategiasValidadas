@@ -1,0 +1,30 @@
+//Se estiver acima do hilo coloca compra na abertura[1] de um atraz
+//14Renko
+//Entrada: Realizar envio de ordens no fechamento do candle
+//Saída: 80_65pts
+
+Input
+PeriodoHilo(3);
+
+Var
+ValorHilo, ValorFechamento  : float;
+ValorAbertura : Float;
+Inicio
+   ValorHilo := (HILOACTIVATOR(PeriodoHilo));
+   ValorFechamento := Fechamento[1];
+   ValorAbertura := Abertura[1];
+
+   Se (HasPosition = False) então
+      Inicio
+         Se (Fechamento > Abertura) e (Fechamento > ValorHilo) e (Time > 0903) então
+           Inicio
+              BuyLimit(ValorAbertura);
+           Fim;
+         Se (Fechamento < Abertura) e (Fechamento < ValorHilo) e (Time > 0903) então
+           Inicio
+              SellShortLimit(ValorAbertura);
+           Fim;
+      Fim;
+      Plot(ValorAbertura);
+
+Fim;

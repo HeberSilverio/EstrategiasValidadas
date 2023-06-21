@@ -1,0 +1,37 @@
+Gradiente com Tilson
+
+
+550
+
+501
+
+Grande intervalo entre Tc e Tl
+460   (436
+
+330  (350
+
+263 - Praticamente o mesmo valor é o stop (278
+
+
+235  (232 - 212,213
+
+se fechamento é maior que a abertura 4 vezes lançar ordem na abertura anterior ou talvez no meio
+
+
+- ACIMA DE 310 não é bom abrir nova operação pode estar no final do movimento
+Só stopA 150 se virar dois box (16R)
+3 corpos 225 (ALVO? 215)
+
+- Considerar tendência a media curta acima da longa
+- A primeira entrada basta considerar a tendência E TrueRange abaixo de 138
+- Não abrir nova operação com dist acima de 310
+- Stop 150pts
+- Alvo scalp 215
+- Se a dist é menor 310 e a posição ainda permite contratos abrir novos no meio do corpo anterior ou se fechar no sentido contrario
+- Se fechou 3 box no sentido contrario da media longa não abrir mais 
+
+PONTO MAIS FORTE
+*(avaliar se começa com dois e faz scalp no segundo ou se começa com 1 e aumenta no critério
+- Para primeira entrada apenas  (Tendência) E (TrueRange < 138
+- Para demais (Tendência) E (dist < 310) E (TrueRange < 138 
+- 

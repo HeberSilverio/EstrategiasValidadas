@@ -1,0 +1,19 @@
+//Ele vende no atr com objetivo de fazer scalp
+//Sem stop pode utilizar ordem oco
+
+var
+Satr: Float;
+
+Inicio
+
+   Satr := StopAtr(2, 20, 0)|0|; //Desvio, Periodo, Aritmética //|0|Valor Atr 
+
+   Se (HasPosition = False) então	
+      Inicio
+         Se (Minima > Satr) então
+           BuyLimit(Satr)
+         Senão se (Maxima < Satr) então
+            SellShortLimit(Satr); 
+      Fim;
+
+Fim;

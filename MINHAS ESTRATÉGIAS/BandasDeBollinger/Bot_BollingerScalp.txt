@@ -1,0 +1,43 @@
+// 10renko Gain85 loss65 Periodo20 (Meta R$60)
+// 10Renko Gain150 Loss70 Periodo50 (MetA R$ 100)
+
+Input
+Desvio(1.70);
+Periodo(50);
+Contratos(1);
+
+Var
+BandaSuperiorV, BandaInferiorC, MediaAritmetica, StopC, AlvoC, StopV, AlvoV : Float;
+
+Inicio
+   SetPlotColor(1, clRed);
+   SetPlotColor(2, clSilver);
+   SetPlotColor(3, clGreen);
+
+   BandaSuperiorV := BollingerBands(Desvio, Periodo, 0)|0|;
+   MediaAritmetica := Media(Periodo, Close);
+   BandaInferiorC := BollingerBands(Desvio, Periodo, 0)|1|;
+
+   Se (HasPosition = False) então	
+   Inicio
+   //condição da venda
+      Se (Fechamento > MediaAritmetica) e (Fechamento < BandaSuperiorV) então   
+         Inicio
+            SellShortLimit(BandaSuperiorV, Contratos);
+            BuyLimit(MediaAritmetica, Contratos);
+         Fim;
+
+   //condição da compra
+     Se (Fechamento < MediaAritmetica) e (Fechamento > BandaInferiorC) então   
+      Inicio
+         Inicio
+            SellShortLimit(MediaAritmetica);
+            BuyLimit(BandaInferiorC);
+         Fim; 
+      Fim; 
+   Fim;
+ 
+   Plot(BandaSuperiorV);
+   Plot2(MediaAritmetica);
+   Plot3(BandaInferiorC);
+Fim;
