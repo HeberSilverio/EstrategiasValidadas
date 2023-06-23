@@ -1,3 +1,4 @@
+//Muda parametros de pontos das entradas da versão 1
 Input
 MMExpPeriodo(2);
 PeriodoMinimas(2);
