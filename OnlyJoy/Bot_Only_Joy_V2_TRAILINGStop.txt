@@ -95,7 +95,8 @@ begin
       StopGainCompra := True;
    if ((pVenda - Minima) > Parcial) then
       StopGainVenda := True;
-
+   
+   
    //Stop movel a partir de 500   
    if ((Maxima - pCompra) > StopMovelApartir) e (High[2] > High[3]) and (High[1] > High[2]) then
       StopMovelCompra := True;
