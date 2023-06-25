@@ -1,0 +1,39 @@
+//Muda parametros de pontos das entradas da versão 1 pois entra na direção do movimento
+//Muda a lógica da compra. Compra se fechar acima da media e vende se fechar abaixo das mínimas
+//Adiciona Fechamento zero maior que os dois anterios
+// Coloca trailing stop depois de 3 fechamentos
+// Colocar a flag para não comprar duas vezes na mesma direção
+// Testar a ideia de Não comprar acima ifr 60 não vender abaixo ifr35
+// Stop um corpo de box
+// Alvo 3 corpo de box
+// no 16R Gain225 L75
+Input
+MMExpPeriodo(2);
+PeriodoMinimas(2);
+FatorCurto(0.60);
+PeriodoCurto(9);
+FatorLonga(0.50);
+PeriodoLonga(25);
+
+Var
+MediaExponencial, nUltimasDuasMinimas, TilsonCurto, TilsonLonga : Float;
+FechamentoVenda, FechamentoCompra, TendenciaAlta, TendenciaBaixa  : boolean;
+ 
+Begin
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga);
+   
+
+   if (Fechamento > Fechamento[1]) e (Fechamento > Fechamento[2]) then Inicio FechamentoVenda := True; Fim;
+   MediaExponencial := MediaExp(MMExpPeriodo,Maxima);
+   nUltimasDuasMinimas := Lowest(Low, PeriodoMinimas)[1];
+
+   Se (TilsonCurto > TilsonLonga) e (Fechamento > MediaExponencial) then 
+   Inicio 
+     PaintBar(ClGreen);
+   Fim;
+   Se (TilsonLonga > TilsonCurto) e (Fechamento < nUltimasDuasMinimas) then PaintBar(ClRed); Fim;
+   
+   Plot(MediaExponencial);
+   Plot2(nUltimasDuasMinimas);
+End;               

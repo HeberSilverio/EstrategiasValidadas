@@ -1,0 +1,22 @@
+Input
+FatorCurto(0.60);
+PeriodoCurto(9);
+FatorLonga(0.50);
+PeriodoLonga(25);
+
+Var
+TilsonCurto, TilsonLonga : Float;
+
+Inicio
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga);
+   
+   SetPlotColor(1, clGreen);
+   SetPlotColor(2, clRed);
+   
+   //Indicador Trend-Cloud
+   Se (TilsonCurto > TilsonLonga) then PaintBar(clBlue)
+   Senão PaintBar(clMarrom);
+   Plot(TilsonCurto);
+   Plot2(TilsonLonga);
+Fim;

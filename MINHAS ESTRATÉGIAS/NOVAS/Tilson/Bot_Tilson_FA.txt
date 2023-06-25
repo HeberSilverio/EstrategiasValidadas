@@ -1,0 +1,50 @@
+//Fechamento maior que abertura e medias de tilson 
+// Coloca trailing stop depois de 3 fechamentos
+// Colocar a flag para não comprar duas vezes na mesma direção
+// Testar a ideia de Não comprar acima ifr 60 não vender abaixo ifr35
+// Stop um corpo de box
+// Alvo 3 corpo de box
+// no 16R Gain225 L75
+Input
+qtdContratos(1);
+AlvoQtBox(3);
+FatorCurto(0.60);
+PeriodoCurto(9);
+FatorLonga(0.50);
+PeriodoLonga(25);
+
+Var
+StopC, AlvoC, StopV, AlvoV, TilsonCurto, TilsonLonga : Float;
+ 
+Begin
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga); 
+     
+   Se (IsSold) então
+     Inicio
+         BuyToCoverLimit(SellPrice-AlvoV*AlvoQtBox, qtdContratos);//Alvo
+         BuyToCoverStop(StopV, StopV+500);//Stop
+      Fim;  
+
+   Se (IsBought) então
+       Inicio
+         SellToCoverLimit(BuyPrice+AlvoC*AlvoQtBox, qtdContratos); //Alvo
+         SellToCoverStop(StopC, StopC-500);//Stop
+      Fim; 
+
+   Se (HasPosition = False) então
+      Inicio
+         Se (TilsonCurto > TilsonLonga) e (Fechamento > Abertura) então
+            Inicio
+               BuyAtMarket(qtdContratos);
+               StopC := Minima-MinPriceIncrement;
+               AlvoC := (Fechamento-Abertura-Tick);
+             Fim;
+         Se (TilsonLonga > TilsonCurto) e (Fechamento < Abertura) então
+            Inicio
+               SellShortAtMarket(qtdContratos);
+               StopV := Maxima+MinPriceIncrement;
+               AlvoV := (Abertura-Fechamento-Tick);
+            Fim;
+      Fim;
+End;               

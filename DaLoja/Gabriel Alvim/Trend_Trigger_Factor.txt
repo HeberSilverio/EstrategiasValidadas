@@ -1,0 +1,76 @@
+//Indicador Trend Trigger Factor de M.H. Pee programado por Gabriel Alvim do canal do YouTube: 
+//https://www.youtube.com/channel/UCxZaNx9hvtkAXgqugP5EH9Q
+
+
+input
+Periodo(15);
+PeriodoMedia(5);
+PeriodoSinal(10);
+
+var
+hhRecent,llRecent,hhOlder,lmid,llOlder,levu,levd,fdn,mah,mal,hhOlder,llOlder,hhRecent,levu,levd,llRecent,buypower,sellpower,val,dslAlpha:float;
+start:integer;
+
+begin
+
+hhRecent := 0;
+llRecent := 0;
+hhOlder := 0; 
+llOlder := 0;
+
+levu := 0;
+levd := 0;
+fdn := 0;
+
+mah := mediaexp(PeriodoMedia,high);
+mal := mediaexp(PeriodoMedia,low);
+
+start := Periodo * 2 - 1;
+hhOlder := (lowest(mah, Periodo)[start]);
+llOlder := (lowest(mal, Periodo)[start]);
+
+hhRecent := (lowest(mah, Periodo-1)[start]);
+llRecent := (lowest(mal, Periodo-1)[start]);
+
+if mah > hhRecent then
+buypower := mah - llOlder
+else
+buypower := hhRecent - llOlder;
+
+if mal < llRecent then
+sellpower := hhOlder - mal
+else
+sellpower := hhOlder - llRecent;
+
+if not (BuyPower + SellPower = 0) then
+val := 100.0 * (BuyPower - SellPower) / (0.5 * (BuyPower + SellPower))
+else
+val := 0; 
+
+dslAlpha := 2.0 / (1.0 + PeriodoSinal);
+
+if val > 0 then
+levu := (levu[1]) + dslAlpha * (val - (levu[1]))
+else
+levu := levu[1];
+
+if val < 0 then
+levd := (levd[1]) + dslAlpha * (val - (levd[1]))
+else
+levd := levd[1];
+
+lmid := (levu + levd)/2;
+
+plot(levu);
+plot2(levd);
+plot3(val);
+plot4(lmid);
+
+if val >= levu then paintbar(cllime);
+if val <= levd then paintbar(clred);
+
+if val >= levu then setplotcolor(3,cllime);
+if val <= levd then setplotcolor(3,clred);
+
+
+end;

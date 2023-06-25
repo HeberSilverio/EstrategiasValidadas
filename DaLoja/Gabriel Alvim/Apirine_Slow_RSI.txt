@@ -1,4 +1,5 @@
 //INDICADOR PROGRAMADO POR GABRIEL ALVIM
+//Releitura do RSI por Vitali Apirine programado por Gabriel Alvim
 //CANAL YOUTUBE: https://www.youtube.com/channel/UCxZaNx9hvtkAXgqugP5EH9Q
 //GRUPO NO FACEBOOK: https://www.facebook.com/groups/estrategiasprofit
 

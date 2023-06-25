@@ -1,0 +1,26 @@
+//Fechamento maior que abertura e medias de tilson 
+Input
+MMExpPeriodo(2);
+PeriodoMinimas(2);
+FatorCurto(0.60);
+PeriodoCurto(9);
+FatorLonga(0.50);
+PeriodoLonga(25);
+
+Var
+MediaExponencial, nUltimasDuasMinimas, TilsonCurto, TilsonLonga : Float;
+FechamentoVenda, FechamentoCompra, TendenciaAlta, TendenciaBaixa  : boolean;
+ 
+Begin
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga);
+   
+   Se (TilsonCurto > TilsonLonga) e (Fechamento > Abertura) then 
+   Inicio 
+     PaintBar(ClGreen);
+   Fim;
+   Se (TilsonLonga > TilsonCurto) e (Fechamento < Abertura) then PaintBar(ClRed); Fim;
+   
+   Plot(MediaExponencial);
+   Plot2(nUltimasDuasMinimas);
+End;               

@@ -1,3 +1,6 @@
+//Releitura do Estocástico introduzida por Lee Leibfarth. Programado por Gabriel Alvim do canal do YouTube:
+//https://www.youtube.com/channel/UCxZaNx9hvtkAXgqugP5EH9Q
+
 input
 PeriodoEstocastico(8);
 PeriodoSuavizacao(25);

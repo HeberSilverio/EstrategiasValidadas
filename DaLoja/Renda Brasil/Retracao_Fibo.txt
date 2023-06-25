@@ -1,0 +1,74 @@
+const
+  mv1 = 100000000;
+  mv2 = 100000000;
+  mv3 = 500000000;
+  mv4 = 1500000000;
+  mv5 = 2000000000;
+
+  AlvoMatematico = 1;  
+  stopmatematico = 0;
+  tickentrada    = 0;
+  tickstop       = 0.5;
+  media9         = 9;
+  hrf            = 900;
+  hrfim          = 1500;
+
+  var
+  Sc,Sv,sc1,sv1,sc2,sv2,sc3,sv3,sc5,sv5: booleano;
+  ssc,ssv:booleano;
+  entradaC,entradaV,stopC,stopV,alvoV : Real;
+  alvoc,alvoc2,alvoc3,alvoc4:real;
+  alvov1,alvov2,alvov3,alvov4:real;
+  va,vs : real;
+  amp : real;
+  m9:real;
+
+INICIO
+
+  
+
+ Sc:=(Fechamento>fechamento[1])e(abertura=abertura[1])e(fechamento>abertura[1])e(time >= Hrf) e (time < HrFim);
+ Sv:=(fechamento<fechamento[1])e(abertura=abertura[1])e(fechamento<abertura[1])e(time >= Hrf) e (time < HrFim);
+
+ m9  := mediaexp(media9,fechamento);
+ amp := abs(abertura-fechamento);
+
+ ssc := (fechamento<abertura);
+ ssv := (fechamento>abertura);
+
+ entradac := abertura + tickentrada;
+ alvoc    := buyprice + (amp * AlvoMatematico + tickentrada);
+ 
+ entradav := abertura - tickentrada;
+ alvoV    := sellprice - (amp * AlvoMatematico - tickentrada);
+
+ se sc e not IsBought e not IsSold entao 
+    BuyLimit(abertura);
+
+  se IsBought =verdadeiro entao 
+   inicio
+     //SellShortStop(stopc,stopc);
+     SellToCoverLimit(alvoc);
+    fim;
+
+    se ssc e IsBought = verdadeiro entao
+     inicio
+       ClosePosition;
+     fim;
+
+ se sv e not IsBought e not IsSold entao 
+    SellShortLimit(entradav);
+
+     se issold = verdadeiro entao
+      inicio
+       //BuyToCoverStop(stopv,stopv);
+        BuyToCoverLimit(alvov);
+      fim;
+
+      se ssv e IsSold = verdadeiro entao
+      inicio
+        closeposition;
+      fim; 
+    
+
+FIM;

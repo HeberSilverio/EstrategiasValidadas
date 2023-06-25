@@ -1,0 +1,20 @@
+//Oscilador criado por Bill Williams, busca identificar a direção da tendência, pullbacks e reversão de tendência. 
+//Programado por Gabriel Alvim do canal do YouTube:
+//https://www.youtube.com/channel/UCxZaNx9hvtkAXgqugP5EH9Q
+
+
+input
+PeriodoCurto(5);
+PeriodoLongo(34);
+var
+AO : Float;
+
+begin
+AO := (((Media(PeriodoCurto,high) + Media(PeriodoCurto,low)) / 2) - ((Media(PeriodoLOngo,high) + Media(PeriodoLOngo,low)) / 2));
+If ao > 0 then
+setplotcolor(1,cllime);
+if ao < 0 then 
+setplotcolor(1,clred);
+	plot(AO);
+
+end;
