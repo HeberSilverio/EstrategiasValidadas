@@ -1,12 +1,8 @@
 //Fechamento com médias tilson cruzadas para baixo
 // Stop 2 corpo de box
 // Alvo 3 corpo de box
-// Geral-> 10R Quantidade máxima múltiplo de 4
-// Entrada-> Realizar envio de ordens no fechamento do candle | Horário de entrada: 09:00 às 17:00
-// Saída-> Zerar às 17:40
-// Risco-> Objetivo de ganho 900, Limite de perda 300
-// Segurança-> Em casos de falha na execução do código: Desativar estratégia, cancelar as ordens e zerar posição
-// Controle de leilão-> Nenhuma Ação
+// No 10R 
+
 Input
 qtdContratos(1);
 FatorCurto(0.60);
@@ -14,7 +10,7 @@ PeriodoCurto(9);
 FatorLonga(0.50);
 PeriodoLonga(25);
 StopLoss(130);
-StopLoss1(155);
+StopLoss1(140);
 Var
 StopV, AlvoV, TilsonCurto, TilsonLonga, AlvoQtBox3, AlvoQtBox4, AlvoQtBox5, AlvoQtBox6, AlvoQtBox7 : Float;
  
@@ -78,7 +74,7 @@ Begin
    Inicio
       if (TilsonCurto < TilsonLonga) e (Fechamento < Abertura) then
             Inicio
-               SellShortLimit(Abertura-MinPriceIncrement, qtdContratos);
+               SellShortLimit(Abertura, qtdContratos);
             Fim;
    Fim;
 
@@ -86,7 +82,7 @@ Begin
    Inicio
       Se (TilsonCurto < TilsonLonga) e (Fechamento > Abertura) então
             Inicio
-               SellShortLimit(Fechamento+(AlvoV/2), qtdContratos);
+               SellShortLimit(Fechamento+(AlvoV-(MinPriceIncrement*2)), qtdContratos);
              Fim;
    Fim;
 End;               

@@ -1,0 +1,78 @@
+Resumo
+Passo 1 – Perguntar ao Chat GPT se ele sabe a linguagem de programação que você quer que ele programe, para que já comece a familiarizar com o assunto.
+Passo 2 – Explicar que tipo de algorítmico você quer criar sem dar muitas informações.
+Passo 3 – Passar informações relevantes para a criação do seu projeto Robô Trader.
+Passo 4 – Solicitar a criação do Robô acordo com as regras que você quer.
+Comece aqui
+Passo 1 – Perguntar se ele sabe a linguagem para que já comece a familiarizar com o assunto
+Você sabe programar em ntsl? A ntsl, é uma linguagem de programação da Nelogica, empresa brasileira de desenvolvimento de software para o mercado financeiro.
+Passo 2 – Explicar o que você quer criar sem dar muitas informações
+Estou desenvolvendo um algoritmo que utiliza programação em Ntsl, que é muito parecida com a linguagem pascal, para criar um robô que faz operações na bolsa de valores brasileira de forma automática, e gostaria da sua ajuda nessa criação.
+Porém antes de começarmos quero te passar algumas informações peculiares a respeito da linguagem ntsl para que tenhamos um melhor resultado na sua criação.
+Passo 3 – Passar informações relevantes para a criação do seu projeto
+A linguem ntsl utiliza para comprar e vender ativos na bolsa funções de envio de ordens para a bolsa. Segue abaixo as funções que serão utilizadas para comprar e vender.
+O nome da função que irei te informar estará entre aspas.
+Função "BuyAtMarket": Essa função é utilizada para fazer uma compra a mercado. A sintaxe da função é BuyAtMarket; 
+Função "BuyLimit": Essa função é utilizada para enviar uma ordem do tipo limite para a bolsa. Nessa função deverá ser informado o preço que deverá ser enviado a ordem, segue um exemplo:
+BuyLimit(Fechamento);
+Na linha acima acabo de especificar para você como é a sintaxe do envio de ordem limit, no preço de fechamento de um candle.
+Função "SellShortAtMarket": Essa função é utilizada para fazer uma venda a mercado. A sintaxe da função é SellShortAtMarket;
+Função "SellShortLimit": Essa função é utilizada para enviar uma ordem de venda do tipo limite para a bolsa. Nessa função deverá ser informado o preço que deverá ser enviado a ordem, segue um exemplo:
+SellShortLimit(Fechamento);
+Na linha acima acabo de especificar para você como é a sintaxe do envio de ordem limit, no preço de fechamento de um candle.
+Lembrando que não é necessário utilizar arrays nesse código, pois a plataforma de negociação que eu utilizo já coleta os dados da bolsa e me entrega o resultado da média aritmética através da seguinte função, e com a seguinte sintaxe:
+Media(Período, serie de dados)
+As series de dados podem ser constituídas pelas seguintes informações, representadas por palavras: fechamento, abertura, máxima, mínima)
+Caso eu sinalize para você que irei utilizar uma média exponencial para o cálculo da média solicitada, utilize a seguinte função:
+MediaExp(Período, serie de dados)
+Deve haver no código uma área de declaração de variáveis. As variáveis das medias devem ser declaradas como float, e não é necessário atribuir valores a elas no momento da declaração.
+Para o uso das funções não utilize "{" e "}" representado entre aspas duplas, mas sim, no lugar de "{" utilize "inicio", e no lugar de "}" utilize "Fim".
+
+O indicador “MACD” tem a seguinte sintaxe: macd(MediaLonga, Mediacurta, MediaDeSinal);
+O indicador “ADX” tem a seguinte sintaxe : adx(PeriodoAdx, MediaADX);
+O Indicador “True Range” tem a seguinte sintaxe: AvgTrueRange(Periodo, Tipo); 
+O indicador “Media Tilson”, tem a seguinte sintaxe: Tilson(FatorTilson, PeriodoMediaTilson); 
+
+Observação: Favor não colocar aspas simples na série de dados das medias moveis, segue um exemplo de como deve ser: MediaExp(Período, Fechamento);
+Favor não utilizar as seguintes funções no código: clrscr e readln.
+Use constantes para definir o período das medias.
+Entendeu as informações que eu te passei?
+
+
+
+
+
+
+
+
+
+
+Passo 4
+Crie um algoritmo que compre se o fechamento do candle for maior que a media exponencial de 9 períodos. Caso o fechamento seja menor que a media exponencial de 9 períodos, então faça uma venda a mercado. Lembrando que o “fechamento” é uma serie de dados e não precisa de atribuição de valores.
+Declare o período da media de 9 na lista de constantes.
+A função de medias moveis deve ser atribuída a uma variável.
+
+
+Utilize o código padrão abaixo para criar todos os algoritmos que eu te pedir.
+	Const
+	//Local de declaração de constantes
+	Var
+	//Local de declaração de variáveis
+	Inicio
+	Se (HasPosition = False) entao
+	inicio
+	//A verificação de compra e venda deve ficar aqui dentro;
+	Fim;
+	Fim;
+
+
+
+
+
+
+
+
+Passo 5 – Solicitar a criação de acordo com as regras que você quer.
+
+
+Quero uma estratégia que compre quando o fechamento for maior que a média exponencial de 9 períodos, e venda quando o fechamento for menor que a média exponencial de 9 períodos

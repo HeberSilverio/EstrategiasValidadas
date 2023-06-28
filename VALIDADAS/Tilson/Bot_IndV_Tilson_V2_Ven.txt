@@ -1,0 +1,112 @@
+//Fechamento com médias tilson cruzadas para baixo
+// Stop 2 corpo de box
+// Alvo 3 corpo de box
+// No 10R 
+const
+FatorCurto = 0.60;
+PeriodoCurto = 9;
+FatorLonga = 0.50;
+PeriodoLonga = 25;
+
+Input
+qtdContratos(1);
+StopLoss1(55);
+StopLoss2(90);
+StopLoss3(110);
+StopLoss4(140);
+AlvoV(45);
+
+var
+TilsonCurto, TilsonLonga, AlvoQtBox3, AlvoQtBox4, AlvoQtBox5 : Float;
+FlagPositionTres : Inteiro;
+ForCandleAgainst : boolean;
+Begin
+
+   AlvoQtBox3 := 3.00;
+   AlvoQtBox4 := 4.00;
+   AlvoQtBox5 := 5.00;
+   
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga); 
+  
+   if (Fechamento[2] > Fechamento[3]) and (Fechamento[1] > Fechamento[2]) and (Fechamento[3] > Abertura[3]) then Inicio ForCandleAgainst := True; Fim;
+   if (Fechamento[1] < Fechamento[2]) and (Fechamento[2] < Fechamento[3]) then Inicio ForCandleAgainst := False; end;
+   
+   if (IsSold) então
+   begin
+         if (SellPosition = 1)then 
+            begin
+               if (FlagPositionTres = 3) then
+                  begin
+                     BuyToCoverLimit(SellPrice-AlvoV*AlvoQtBox4, qtdContratos); //Alvo
+                     BuyToCoverStop(SellPrice+StopLoss2, SellPrice+StopLoss2+500, qtdContratos);//Stop 
+                  end
+               else
+                     BuyToCoverLimit(SellPrice-AlvoV*AlvoQtBox3, qtdContratos); //Alvo
+                     BuyToCoverStop(SellPrice+StopLoss4, SellPrice+StopLoss4+500, qtdContratos);//Stop   
+            end;
+         if (SellPosition = 2) then
+            begin
+               if (FlagPositionTres = 3) then
+                  begin
+                     BuyToCoverLimit((SellPrice-(AlvoV*AlvoQtBox4)), qtdContratos); //Alvo
+                     BuyToCoverLimit((SellPrice-(AlvoV*AlvoQtBox5)), qtdContratos); //Alvo
+                     BuyToCoverStop(SellPrice+StopLoss2, SellPrice+StopLoss2+500, qtdContratos);//Stop
+                     BuyToCoverStop(SellPrice+StopLoss3, SellPrice+StopLoss3+500, qtdContratos);//Stop
+                  end
+               else
+                     BuyToCoverLimit((SellPrice-(AlvoV*AlvoQtBox3)), qtdContratos); //Alvo
+                     BuyToCoverLimit((SellPrice-(AlvoV*AlvoQtBox4)), qtdContratos); //Alvo
+                     BuyToCoverStop(SellPrice+StopLoss3, SellPrice+StopLoss3+500, qtdContratos);//Stop
+                     BuyToCoverStop(SellPrice+StopLoss3, SellPrice+StopLoss3+500, qtdContratos);//Stop
+            end; 
+         if (SellPosition = 3) then
+            Inicio
+               BuyToCoverLimit(SellPrice-(AlvoV*AlvoQtBox3), qtdContratos); //Alvo
+               BuyToCoverLimit(SellPrice-(AlvoV*AlvoQtBox5-MinPriceIncrement), qtdContratos); //Alvo
+               BuyToCoverLimit(SellPrice-(AlvoV*AlvoQtBox5-MinPriceIncrement), qtdContratos); //Alvo
+               BuyToCoverStop(SellPrice+StopLoss2, SellPrice+StopLoss2+500, qtdContratos);//Stop
+               BuyToCoverStop(SellPrice+StopLoss3, SellPrice+StopLoss3+500, qtdContratos);//Stop 
+               BuyToCoverStop(SellPrice+StopLoss4, SellPrice+StopLoss4+500, qtdContratos);//Stop
+               FlagPositionTres := 3;
+            end;
+         if (SellPosition = 4) then
+          Inicio
+            BuyToCoverLimit((SellPrice-(AlvoV*AlvoQtBox3)), qtdContratos); //Alvo
+            BuyToCoverLimit((SellPrice-(AlvoV*AlvoQtBox4)), qtdContratos); //Alvo
+            BuyToCoverLimit((SellPrice-AlvoV*AlvoQtBox5), qtdContratos); //Alvo
+            BuyToCoverLimit((SellPrice-AlvoV*AlvoQtBox5), qtdContratos); //Alvo
+            BuyToCoverStop(SellPrice+StopLoss1, SellPrice+StopLoss1+500, qtdContratos);//Stop
+            BuyToCoverStop(SellPrice+StopLoss2, SellPrice+StopLoss2+500, qtdContratos);//Stop
+            BuyToCoverStop(SellPrice+StopLoss3, SellPrice+StopLoss3+500, qtdContratos);//Stop 
+            BuyToCoverStop(SellPrice+StopLoss3, SellPrice+StopLoss3+500, qtdContratos);//Stop  
+          end;     
+      end; 
+   if (SellPosition = 0) then
+      Inicio
+         //Reseta flag
+         FlagPositionTres := 0;
+         Se (TilsonCurto < TilsonLonga) e (Fechamento < Abertura) então
+            Inicio
+               SellShortLimit(Fechamento, qtdContratos);
+            end;
+         Se (TilsonCurto < TilsonLonga) e (ForCandleAgainst = True) então
+            Inicio
+               SellShortLimit(Fechamento, qtdContratos);
+            end;
+      end;
+   if (SellPosition > 0) e (SellPosition < 4) then
+      Inicio
+         if (TilsonCurto < TilsonLonga) e (Fechamento < Abertura) then
+            Inicio
+               SellShortLimit(Abertura, qtdContratos);
+            end;
+      end;
+   if (SellPosition > 0) e (SellPosition < 4) then
+      Inicio
+         Se (TilsonCurto < TilsonLonga) e (Fechamento > Abertura) então
+            Inicio
+               SellShortLimit(Fechamento+(AlvoV-(MinPriceIncrement*2)), qtdContratos);
+            end;
+      end;
+End;               
