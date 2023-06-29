@@ -41,7 +41,7 @@ begin
                SellToCoverStop(BuyPrice-StopLoss2, BuyPrice-StopLoss2-500, qtdContratos);//Stop
             end
             else
-               SellToCoverLimit(BuyPrice+AlvoC*AlvoQtBox3, qtdContratos); //Alvo
+               SellToCoverLimit(BuyPrice+AlvoC*AlvoQtBox4, qtdContratos); //Alvo
                SellToCoverStop(BuyPrice-StopLoss4, BuyPrice-StopLoss4-500, qtdContratos);//Stop
          end;
          if (BuyPosition = 2) then
@@ -105,7 +105,7 @@ begin
       end;
    end;
 
-   if (BuyPosition > 0) e (BuyPosition < 4) then
+   if (BuyPosition > 1) e (BuyPosition < 4) then
    begin
       if (TilsonCurto > TilsonLonga) e (Fechamento < Abertura) then
       begin

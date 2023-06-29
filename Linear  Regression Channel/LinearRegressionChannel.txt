@@ -1,0 +1,56 @@
+Input
+Periodo(140);
+DesvioSuperior(1.70);
+DesvioInferior(1.70);
+
+var
+LinhaCentral, CanalSuperior, CanalInferior, IndicadorCentral, IndicadorInferior, IndicadorSuperior : real;
+
+Inicio
+   //Cores 
+   // Central Branco3 tracejado
+   // IndicadorCentral4 - clAqua ou clAzulClaro - Cor azul-claro
+   // Linha superior1 - clMaroon ou clMarrom - Cor marrom
+   // Indicador Superior2 - clRed ou clVermelho - Cor vermelha
+   // Linha Inferior6 - clGreen ou clVerde - Cor verde
+   // Indicador Inferior5 - clLime ou clVerdeLimao - Cor verde-limão
+   //  clGray clBlue
+
+   SetPlotColor(1, clMaroon);
+   SetPlotColor(2, clRed);
+   SetPlotColor(3, clWhite);
+   SetPlotColor(4, clAqua);
+   SetPlotColor(5, clLime);
+   SetPlotColor(6, clGreen);
+   SetPlotColor(7, clYellow);
+
+   LinhaCentral :=  (LinearRegressionChannel(Periodo, true, 2, true, 2)|0|);
+   CanalSuperior := (LinearRegressionChannel(Periodo, true, DesvioSuperior, true, 2)|1|);
+   CanalInferior := (LinearRegressionChannel(Periodo, true, 2, true, DesvioInferior)|2|);
+
+   Plot(CanalSuperior);
+   Plot3(LinhaCentral);
+   Plot6(CanalInferior);
+
+   //Para linha central
+   if (Maxima > LinhaCentral) e (Minima < LinhaCentral) then IndicadorCentral := LinhaCentral;
+   //if (1 <> 0) then Plot4(IndicadorCentral); //<> diferente de 0
+
+   //Para linha Superior
+   if (Maxima > CanalInferior) e (Minima < CanalInferior) then IndicadorInferior := CanalInferior;
+   //if (1 <> 0) then Plot5(IndicadorInferior); //<> diferente de 0
+   
+   //Para linha Superior
+   if (Maxima > CanalSuperior) e (Minima < CanalSuperior) then IndicadorSuperior := CanalSuperior;
+   //if (1 <> 0) then Plot2(IndicadorSuperior); //<> diferente de 0
+
+   //if (fechamento > LinhaCentral) e (MaxBarsForward < Periodo) then 
+      //PaintBar(clVerdeLimao)
+   //else if (fechamento < LinhaCentral) e (MaxBarsForward < Periodo) then
+
+
+   //No exemplo, será aplicada uma coloração no candle anterior ao atual.
+   //if (MaxBarsForward = 1) then PaintBar(clGreen);
+
+   
+Fim;

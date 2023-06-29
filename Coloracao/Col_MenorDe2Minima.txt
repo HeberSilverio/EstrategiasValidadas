@@ -1,0 +1,42 @@
+//Muda parametros de pontos das entradas da versão 1
+Input
+MMExpPeriodo(2);
+PeriodoMinimas(2);
+PtsAbaixoMinima(30);
+PtsAcimaMedia(25);
+PtsParaCompra(40);
+PtsParaVenda(40);
+Var
+MediaExponencial, nUltimasDuasMinimas, MenorMinima, CondicaoCompra, PrecoOrdemCompra, PrecoOrdemVenda : Float;
+CondicaoVenda, CondicaoCompra : boolean;
+
+Begin
+   SetPlotColor(1, clYellow);
+   SetPlotColor(2, clGray);
+   SetPlotColor(3, clGreen);
+
+   MediaExponencial := MediaExp(MMExpPeriodo,Maxima);
+   nUltimasDuasMinimas := Lowest(Low, PeriodoMinimas)[1];
+   
+   MenorMinima := nUltimasDuasMinimas; 
+   CondicaoVenda 
+
+   CondicaoCompra := MediaExponencial+PtsAcimaMedia;
+   
+   PrecoOrdemCompra := Fechamento-PtsParaCompra;
+   PrecoOrdemVenda := Fechamento+PtsParaVenda;
+
+
+   Se (Fechamento < CondicaoVenda) então
+     Inicio
+       PaintBar(ClRed);
+     Fim;
+   Se (Fechamento > MediaExponencial) então
+     Inicio
+        PaintBar(ClGreen);
+     Fim;
+    
+   
+   Plot(MediaExponencial);
+   Plot2(nUltimasDuasMinimas);
+End;               
