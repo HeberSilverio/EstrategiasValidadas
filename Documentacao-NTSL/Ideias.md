@@ -1,3 +1,8 @@
+#### Uma ideia é fazer um robo de scalper no Canal_Regress 8Pt
+- um scalper de 80 pontos que vende no fechamento acima e sai no fechamento abaixo
+- se colocar heikinash no 8 pt será que ele pega pernadas
+
+### 
 
 #### Estratégia NOVA Gradiente no Bot_Canal_Regress
 - Colocar trailing stop (tem na Bot_Canal_Regress)
@@ -7,6 +12,14 @@
 - pernadas no 8pt chegam 500pts retornos des 300
 - no retorno da para pegar 6 (6*40) corpos a favor no 8Pt
 - dá para colocar um stop do SellPrice + 3 corpos
+
+
+Stop Loss - 160 do BuyPrice 
+ou se ((Fechamento - BuyPrice) > 100pts) e (SinalVenda = True)
+
+-- dá colocar uma flag se andou 5 box a favor colocar o stop loss se voltar 5.
+-- Outra ideia que pode ser é ver qual a foi a mínima dos últimos 5 candles se voltar 160 pontos deste ponto seria um bom stop?
+
 
 
 #### Minimas

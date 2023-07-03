@@ -1,0 +1,166 @@
+const
+FatorCurto = 0.60;
+PeriodoCurto = 9;
+FatorLonga = 0.50;
+PeriodoLonga = 25;
+
+input
+QtdMinContratos(1);
+StopLoss(75);
+StopGain(100);
+var
+
+TilsonCurto, TilsonLonga, AcimaDaVenda, AbaixoDaCompra, GainCompra, GainVenda : Float;
+SinalCompra, SinalVenda, CondicaoCompra, CondicaoVenda, StopLossCompra, StopLossVenda, StopGainCompra, StopGainVenda : boolean;
+
+Begin
+ 
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga);
+
+   if (close > SellPrice) then
+   AcimaDaVenda := (close - SellPrice)
+   else
+   AcimaDaVenda := 0; 
+
+   if (close < BuyPrice) then
+   AbaixoDaCompra := (BuyPrice - fechamento)
+   else
+   AbaixoDaCompra := 0;
+
+   SinalCompra := False;
+   SinalVenda := False;
+   CondicaoCompra := False;
+   CondicaoVenda := False;
+   StopLossCompra := False;
+   StopLossVenda := False;
+   StopGainCompra := False;
+   StopGainVenda := False;
+
+   If (Fechamento > Abertura) e (TilsonCurto > TilsonCurto[2]) then Inicio CondicaoCompra := True; Fim; 
+   If (Fechamento < Abertura) e (TilsonCurto < TilsonCurto[2]) then Inicio CondicaoVenda := True; Fim;
+
+   If (Fechamento > Abertura) e (TilsonCurto > TilsonLonga) e (Fechamento[1] > TilsonCurto)  then Inicio SinalCompra := True; Fim;
+   If (Fechamento < Abertura) e (TilsonCurto < TilsonLonga) e (Fechamento[1] < TilsonCurto)   then Inicio SinalVenda := True; Fim;  
+
+   if (AbaixoDaCompra > StopLoss) then StopLossCompra := True; 
+   if (AcimaDaVenda > StopLoss) then StopLossVenda := True; 
+
+   GainCompra := (Fechamento - BuyPrice);
+   GainVenda := (SellPrice - fechamento);
+
+   if (GainCompra > StopGain) then StopGainCompra := True;
+   if (GainVenda > StopGain) then StopGainVenda := True;
+
+   if (IsSold) then
+   begin
+      if (SellPosition = 1)then 
+      begin
+         if ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) then
+            BuyToCoverAtMarket(SellPosition)  
+         else if ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) then
+            BuyToCoverAtMarket(SellPosition);
+      end;
+      if (SellPosition = 2) then
+         begin
+            if ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) then
+               BuyToCoverAtMarket(SellPosition)  
+            else if ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) then
+               BuyToCoverAtMarket(SellPosition);   
+         end;
+      if (SellPosition = 3) then
+         begin
+            if (StopGainVenda = Verdadeiro) then
+               BuyToCoverAtMarket(QtdMinContratos*2);
+            if ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) then
+               BuyToCoverAtMarket(SellPosition)  
+            else if ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) then
+               BuyToCoverAtMarket(SellPosition);   
+         end;
+      if (SellPosition = 4) then
+         begin
+            if (StopGainVenda = Verdadeiro) then
+               BuyToCoverAtMarket(QtdMinContratos*3);
+            if ( (SinalCompra = Verdadeiro) ou (Time > 1750) ) then
+               BuyToCoverAtMarket(SellPosition)  
+            else if ( (StopLossVenda = Verdadeiro) ou (Time > 1750) ) then
+               BuyToCoverAtMarket(SellPosition);   
+         end;     
+   end;
+
+   if (IsBought) then
+   begin
+      if (BuyPosition = 1) then 
+      begin
+         if ( (SinalVenda = Verdadeiro) ou (Time > 1740) ) then
+            SellToCoverAtMarket(BuyPosition)
+         else if ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) then
+            SellToCoverAtMarket(BuyPosition);
+      end;
+      if (BuyPosition = 2) then
+         begin
+            if ( (SinalVenda = Verdadeiro) ou (Time > 1740) ) then
+               SellToCoverAtMarket(BuyPosition)
+            else if ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) then
+               SellToCoverAtMarket(BuyPosition);
+         end;
+      if (BuyPosition = 3) then
+         begin
+            if (StopGainCompra = Verdadeiro) then
+            begin
+               SellToCoverAtMarket(QtdMinContratos*2);
+            end;
+            if ( (SinalVenda = Verdadeiro) ou (Time > 1740) ) then
+               SellToCoverAtMarket(BuyPosition)
+            else if ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) then
+               SellToCoverAtMarket(BuyPosition);
+         end;
+      if (BuyPosition >= 4) then
+         begin
+            if (StopGainCompra = Verdadeiro) then
+            begin
+               SellToCoverAtMarket(QtdMinContratos*3);
+            end;
+            if ( (SinalVenda = Verdadeiro) ou (Time > 1740) ) then
+               SellToCoverAtMarket(BuyPosition)
+            else if ( (StopLossCompra = Verdadeiro) ou (Time > 1750) ) then
+               SellToCoverAtMarket(BuyPosition);
+         end;
+   end; 
+
+   If (SinalCompra = True) e (CondicaoCompra = True) then
+   begin
+      if (BuyPosition = 0) then
+      begin
+         BuyAtMarket(QtdMinContratos*2);
+      end;
+   end;
+   if (BuyPosition > 0) e (BuyPosition < 4) then
+   begin
+      if (Fechamento < Abertura) then
+         BuyAtMarket(QtdMinContratos)
+      else if (Fechamento > BuyPrice) then
+         BuyAtMarket(QtdMinContratos);
+   end;  
+         
+   if (SinalVenda = True) e (CondicaoVenda = True) then
+   Begin
+      if (SellPosition = 0) then
+      begin
+         SellShortAtMarket(QtdMinContratos*2);
+      end;
+   End;      
+   if (SellPosition > 0) e (SellPosition < 4) then
+   begin
+      if (Fechamento > Abertura) then
+      begin
+         SellShortAtMarket(QtdMinContratos);
+      end;
+      if (Fechamento < Abertura) e (Fechamento < SellPrice) then
+      begin
+         SellShortAtMarket(QtdMinContratos);
+      end;
+   end; 
+         if (Time >= 1752) and isBought then ClosePosition;
+         if (Time >= 1752) and isSold then ClosePosition;
+End;
