@@ -1,0 +1,74 @@
+const
+FatorCurto = 0.45;
+PeriodoCurto = 13;
+FatorLonga = 0.50;
+PeriodoLonga = 27;
+Desvio = 1.75;
+PeriodoKeltner = 23;// Aritmetica
+PeriodoBollinger = 20;// Aritmetica
+
+input
+QtdMinContratos(1);
+StopGain(300);
+StopLoss1(140);
+StopLoss2(110);
+var
+TilsonCurto, TilsonLonga, KeltnerSuperior, KeltnerInferior, BollingerSuperior, BollingerInferior, AbaixoDaCompra, AcimaDaVenda : Float;
+begin
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga); 
+
+   KeltnerSuperior := KeltnerCH(Desvio, PeriodoKeltner, 0)|0|;
+   KeltnerInferior := KeltnerCH(Desvio, PeriodoKeltner, 0)|1|;
+
+   BollingerSuperior := BollingerBands(Desvio, PeriodoBollinger, 0)|0|;
+   BollingerInferior := BollingerBands(Desvio, PeriodoBollinger, 0)|1|;
+
+   if (close < BuyPrice) then AbaixoDaCompra := (BuyPrice - fechamento) else AbaixoDaCompra := 0;
+   if (close > SellPrice) then AcimaDaVenda := (fechamento - SellPrice) else AcimaDaVenda := 0;
+
+   if (IsSold) then
+   begin
+      if (Fechamento > SellPrice) then
+      begin 
+         if (AcimaDaVenda > StopLoss1) then
+            BuyToCoverAtMarket(SellPosition);
+      end;
+      if ((SellPrice - Minima) > (StopGain)) then
+      begin
+         BuyToCoverAtMarket(SellPosition);
+      end;
+   end;
+
+   if (IsBought) then
+   begin
+      if (Fechamento < BuyPrice) then
+      begin 
+         if (AbaixoDaCompra > StopLoss1) then
+            SellToCoverAtMarket(BuyPosition);
+      end;
+      if ((Maxima - BuyPrice) > (StopGain)) then
+      begin
+         SellToCoverAtMarket(BuyPosition);
+      end;
+   end;
+
+   if (TilsonCurto > TilsonLonga) then
+   begin
+      if (HasPosition = False) then
+      begin
+         BuyLimit(KeltnerInferior, QtdMinContratos);
+         BuyLimit(BollingerInferior, QtdMinContratos);
+      end;
+   end;
+   
+   if (TilsonCurto < TilsonLonga) then
+   begin
+      if (HasPosition = False) then
+      begin
+         SellShortLimit(KeltnerSuperior, QtdMinContratos);
+         SellShortLimit(BollingerSuperior, QtdMinContratos);
+      end;
+   end;
+
+end;

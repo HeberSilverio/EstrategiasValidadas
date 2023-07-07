@@ -1,8 +1,5 @@
 var
-SinalCompra : boolean;
-SinalVenda : boolean;
-TilsonCompra : boolean;
-TilsonVenda : boolean;
+SinalCompra, SinalVenda, TilsonCompra, TilsonVenda : boolean;
 
 Inicio
    TilsonCompra := (Fechamento > Fechamento[1]) e (Fechamento > TILSON(0.45,9)) e (TILSON(0.45,9) > TILSON(0.45,9)[3]);

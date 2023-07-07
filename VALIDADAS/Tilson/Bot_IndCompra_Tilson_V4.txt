@@ -19,14 +19,14 @@ AlvoC(45);
 StopGain(300);
 var
 TilsonCurto, TilsonLonga,AlvoQtBox3, AlvoQtBox4, AlvoQtBox5, GainCompra, AbaixoDaCompra : Float;
-FlagPositionTres : Inteiro;
 ForCandleAgainst, SinalCompra : boolean;
-
+nUltimasTresMinimas : Float;
 begin
    AlvoQtBox3 := 3.00;
    AlvoQtBox4 := 4.00;
    AlvoQtBox5 := 5.00;
 
+   nUltimasTresMinimas := Lowest(Low, 3);
    SinalCompra := False;
 
    TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
@@ -44,64 +44,50 @@ begin
    if (IsBought) then
    begin
          if (BuyPosition = 1) then 
-         begin
-
-            if (Fechamento > BuyPrice) e (Minima[6] > BuyPrice) then
-            begin
-               SellToCoverStop(Low[6], QtdMinContratos );
-            end
-            else if (Fechamento < BuyPrice) then
+         begin          
+            if (Fechamento < BuyPrice) then
             begin 
                if (AbaixoDaCompra > StopLoss3) then
                   SellToCoverAtMarket(BuyPosition);
+            end;
+            if ((Maxima - BuyPrice) > (StopGain*1.5)) then
+            begin
+               SellToCoverAtMarket(QtdMinContratos);
             end;
          end;
 
          if (BuyPosition = 2) then
          begin
-            if (Fechamento > BuyPrice) e (Minima[6] > BuyPrice) then
-            begin
-               SellToCoverStop(Low[6], BuyPosition);
-            end
-            else if (Fechamento < BuyPrice) then
+            if (Fechamento < BuyPrice) then
             begin 
                if (AbaixoDaCompra > StopLoss3) then
                   SellToCoverAtMarket(BuyPosition);
             end;
-            if (GainCompra > StopGain) then
+            if ((Maxima - BuyPrice) > StopGain) then
             begin
                SellToCoverAtMarket(QtdMinContratos);
             end;
          end;
          if (BuyPosition = 3) then
-         begin
-            if (Fechamento > BuyPrice) e (Minima[6] > BuyPrice) then
-            begin
-               SellToCoverStop(Low[6], BuyPosition);
-            end
-            else if (Fechamento < BuyPrice) then
+         begin            
+            if (Fechamento < BuyPrice) then
             begin 
                if (AbaixoDaCompra > StopLoss3) then
                   SellToCoverAtMarket(BuyPosition);
             end;
-            if (GainCompra > StopGain) then
+            if ((Maxima - BuyPrice) > StopGain) then
             begin
                SellToCoverAtMarket(QtdMinContratos*2);
             end;
-
          end;
          if (BuyPosition = 4) then
          begin
-            if (Fechamento > BuyPrice) e (Minima[6] > BuyPrice) then
-            begin
-               SellToCoverStop(Low[6], BuyPosition);
-            end
-            else if (Fechamento < BuyPrice) then
+            if (Fechamento < BuyPrice) then
             begin 
                if (AbaixoDaCompra > StopLoss3) then
                   SellToCoverAtMarket(BuyPosition);
             end;
-            if (GainCompra > StopGain) then
+            if ((Maxima - BuyPrice) > StopGain) then
             begin
                SellToCoverAtMarket(QtdMinContratos*3);
             end;
@@ -110,17 +96,7 @@ begin
 
    if (BuyPosition = 0) then
    begin
-      //Reseta flag
-      FlagPositionTres := 0;
       if (TilsonCurto > TilsonLonga) e (Fechamento > Abertura) then
-      begin
-         BuyLimit(Fechamento, QtdMinContratos);
-      end
-      else if (SinalCompra = True) then
-      begin
-         BuyLimit(Fechamento, QtdMinContratos);
-      end
-      else if (TilsonCurto > TilsonLonga) e (ForCandleAgainst = True) then
       begin
          BuyLimit(Fechamento, QtdMinContratos);
       end;

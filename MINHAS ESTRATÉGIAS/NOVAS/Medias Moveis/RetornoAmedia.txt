@@ -1,0 +1,116 @@
+// Stop 2 corpo de box
+// Alvo 3 corpo de box
+// Acima do 14r
+
+
+const
+PeriodoCurto = 11;
+PeriodoLonga = 25;
+
+input
+QtdMinContratos(1);
+StopLoss1(55);
+StopLoss2(90);
+StopLoss3(110);
+StopLoss4(140);
+AlvoC(45);
+StopGain(160);
+var
+AlvoQtBox3, AlvoQtBox4, AlvoQtBox5, GainVenda, AcimaDaVenda, MediaExpCurta, MediaExpLonga : Float;
+SinalVenda : boolean;
+
+begin
+   AlvoQtBox3 := 3.00;
+   AlvoQtBox4 := 4.00;
+   AlvoQtBox5 := 5.00;
+
+   SinalVenda := False;
+
+   MediaExpCurta := MediaExp(PeriodoCurto,Close);
+   MediaExpLonga := MediaExp(PeriodoLonga,Close);
+   
+   SinalVenda := (MediaExpCurta < MediaExpLonga); 
+   GainVenda := (SellPrice - Fechamento);
+
+   if (close > SellPrice) then AcimaDaVenda := (fechamento - SellPrice) else AcimaDaVenda := 0;
+
+   
+   if (IsSold) then
+   begin
+         if (SellPosition = 1) then 
+         begin          
+            if (Fechamento > SellPrice) then
+            begin 
+               if (AcimaDaVenda > StopLoss3) then
+                  BuyToCoverAtMarket(SellPosition);
+            end;
+            if ((SellPrice - Minima) > (StopGain)) then
+            begin
+               BuyToCoverAtMarket(QtdMinContratos);
+            end;
+         end;
+
+         if (SellPosition = 2) then
+         begin
+            if (Fechamento > SellPrice) then
+            begin 
+               if (AcimaDaVenda > StopLoss3) then
+                  BuyToCoverAtMarket(SellPosition);
+            end;
+            if ((SellPrice - Minima) > StopGain) then
+            begin
+               BuyToCoverAtMarket(QtdMinContratos);
+            end;
+         end;
+         if (SellPosition = 3) then
+         begin            
+            if (Fechamento > SellPrice) then
+            begin 
+               if (AcimaDaVenda > StopLoss3) then
+                  BuyToCoverAtMarket(SellPosition);
+            end;
+            if ((SellPrice - Minima) > StopGain) then
+            begin
+               BuyToCoverAtMarket(QtdMinContratos*2);
+            end;
+         end;
+         if (SellPosition = 4) then
+         begin
+            if (Fechamento > SellPrice) then
+            begin 
+               if (AcimaDaVenda > StopLoss3) then
+                  BuyToCoverAtMarket(SellPosition);
+            end;
+            if ((SellPrice - Minima) > StopGain) then
+            begin
+               BuyToCoverAtMarket(QtdMinContratos*3);
+            end;
+         end;     
+   End; 
+
+   if (SellPosition = 0) then
+   begin
+      if (SinalVenda = True) then
+      begin
+         Se (Fechamento < MediaExpLonga) entao
+            SellShortLimit(MediaExpLonga, QtdMinContratos);
+      end;
+   end;
+
+   if (SellPosition > 1) e (SellPosition < 4) then
+   begin
+      if (SinalVenda = True) then
+      begin
+         Se (Fechamento < MediaExpCurta) entao
+            SellShortLimit(MediaExpCurta, QtdMinContratos);
+      end;
+   end;
+
+   if (SellPosition > 1) e (SellPosition < 4) then
+   begin
+     if (SinalVenda = True) e (Fechamento > MediaExpLonga)  then
+      begin
+         SellShortLimit(Fechamento, QtdMinContratos);
+      end;
+   end;
+end;               
