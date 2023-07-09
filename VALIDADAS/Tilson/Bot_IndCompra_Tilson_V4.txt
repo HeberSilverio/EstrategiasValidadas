@@ -4,11 +4,12 @@
 // diferença é que carrega um contrato e insere ordens de fechamento a mercado
 //e também considera sinal de compra se fechar acima das duas médias
 const
-FatorCurto = 0.60;
-PeriodoCurto = 9;
+FatorCurto = 0.45;
+PeriodoCurto = 12;
 FatorLonga = 0.50;
-PeriodoLonga = 25;
-
+PeriodoLonga = 27;
+HoraInicio = 900;
+HoraFim = 1600;
 input
 QtdMinContratos(1);
 StopLoss1(55);
@@ -19,27 +20,32 @@ AlvoC(45);
 StopGain(300);
 var
 TilsonCurto, TilsonLonga,AlvoQtBox3, AlvoQtBox4, AlvoQtBox5, GainCompra, AbaixoDaCompra : Float;
-ForCandleAgainst, SinalCompra : boolean;
-nUltimasTresMinimas : Float;
+SinalCompra, CondicaoCompra  : boolean;
+
 begin
    AlvoQtBox3 := 3.00;
    AlvoQtBox4 := 4.00;
    AlvoQtBox5 := 5.00;
 
-   nUltimasTresMinimas := Lowest(Low, 3);
-   SinalCompra := False;
-
    TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
    TilsonLonga := Tilson(FatorLonga, PeriodoLonga); 
-   
-   if (Fechamento[2] < Fechamento[3]) and (Fechamento[1] < Fechamento[2]) and (Fechamento[3] < Abertura[3]) then begin ForCandleAgainst := True; end;
-   if (Fechamento[1] > Fechamento[2]) and (Fechamento[2] > Fechamento[3]) then begin ForCandleAgainst := False; end;  
+
+   if (close > TilsonCurto) e (close > TilsonLonga) then 
+   begin
+   SinalCompra := True;
+   end
+   else SinalCompra := false;
+
+   Se (TilsonCurto > TilsonLonga) e (Fechamento > Abertura) then
+   begin
+   CondicaoCompra := True;
+   end
+   else CondicaoCompra := false;
   
    GainCompra := (Fechamento - BuyPrice);
 
    if (close < BuyPrice) then AbaixoDaCompra := (BuyPrice - fechamento) else AbaixoDaCompra := 0;
 
-   if (close > TilsonCurto) e (close > TilsonLonga) then SinalCompra := True;
 
    if (IsBought) then
    begin
@@ -94,9 +100,9 @@ begin
          end;     
    End; 
 
-   if (BuyPosition = 0) then
+   if (BuyPosition = 0) e (Time > HoraInicio) e (Time < HoraFim) then
    begin
-      if (TilsonCurto > TilsonLonga) e (Fechamento > Abertura) then
+      if (CondicaoCompra = true) ou (SinalCompra = true) then
       begin
          BuyLimit(Fechamento, QtdMinContratos);
       end;
@@ -117,4 +123,5 @@ begin
          BuyLimit(Fechamento-(AlvoC+MinPriceIncrement), QtdMinContratos);
       end;
    end;
+   Se (Time > 1738) então ClosePosition;
 end;               

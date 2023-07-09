@@ -1,8 +1,12 @@
 // testado o resultado apenas no 14r
 // Colocar 6 contratos por operação
+// 09:00 até 16:00 - zerar as 17:38
+// Perda do dia -450
+//Trend Cloud 0.45 12 0.50 27 | Keltner 1,75 23A   | Bollinger 1,75 - 20A
+
 const
 FatorCurto = 0.45;
-PeriodoCurto = 13;
+PeriodoCurto = 12;
 FatorLonga = 0.50;
 PeriodoLonga = 27;
 Desvio = 1.75;
@@ -242,5 +246,5 @@ begin
         end;
       end;
    end;
-   Se (Time > 1745) então ClosePosition;
+   Se (Time > 1738) então ClosePosition;
 end;

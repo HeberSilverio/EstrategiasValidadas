@@ -4,11 +4,12 @@
 // diferença é que carrega um contrato e insere ordens de fechamento a mercado
 //e também considera sinal de compra se fechar acima das duas médias
 const
-FatorCurto = 0.60;
-PeriodoCurto = 9;
+FatorCurto = 0.45;
+PeriodoCurto = 12;
 FatorLonga = 0.50;
-PeriodoLonga = 25;
-
+PeriodoLonga = 27;
+HoraInicio = 900;
+HoraFim = 1600;
 input
 QtdMinContratos(1);
 StopLoss1(55);
@@ -90,7 +91,7 @@ begin
          end;     
    End; 
 
-   if (SellPosition = 0) then
+   if (SellPosition = 0) e (Time > HoraInicio) e (Time < HoraFim) then
    begin
       if (TilsonCurto < TilsonLonga) e (Fechamento < Abertura) then
       begin
@@ -98,7 +99,7 @@ begin
       end;
    end;
 
-   if (SellPosition > 0) e (SellPosition < 4) then
+   if (SellPosition > 0) e (SellPosition < 4) e (Time > HoraInicio) e (Time < HoraFim) then
    begin
       if (TilsonCurto < TilsonLonga) e (Fechamento < Abertura) then
       begin
@@ -106,11 +107,12 @@ begin
       end;
    end;
 
-   if (SellPosition > 1) e (SellPosition < 4) then
+   if (SellPosition > 1) e (SellPosition < 4) e (Time > HoraInicio) e (Time < HoraFim) then
    begin
       if (TilsonCurto < TilsonLonga) e (Fechamento > Abertura) then
       begin
          SellShortLimit(Fechamento+(AlvoC-MinPriceIncrement), QtdMinContratos);
       end;
    end;
+   Se (Time > 1738) então ClosePosition;
 end;               

@@ -1,0 +1,114 @@
+// compra objetivo de 55pts
+// Saída OCO Gain 55pts stop 250
+// no 13R
+// diferença é que carrega um contrato e insere ordens de fechamento a mercado
+//e também considera sinal de compra se fechar acima das duas médias
+const
+FatorCurto = 0.45;
+PeriodoCurto = 12;
+FatorLonga = 0.50;
+PeriodoLonga = 27;
+Desvio = 1.75;
+PeriodoKeltner = 23;// Aritmetica
+PeriodoBollinger = 20;// Aritmetica
+HoraInicio = 900;
+HoraFim = 1600;
+
+input
+QtdMinContratos(1);
+
+var
+TilsonCurto, TilsonLonga, KeltnerSuperior, KeltnerInferior, BollingerSuperior, BollingerInferior, DistanciaDaBandaSuperior, DistanciaDaBandaInferior : Float;
+
+begin
+   
+
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga); 
+
+   KeltnerSuperior := KeltnerCH(Desvio, PeriodoKeltner, 0)|0|;
+   KeltnerInferior := KeltnerCH(Desvio, PeriodoKeltner, 0)|1|;
+
+   BollingerSuperior := BollingerBands(Desvio, PeriodoBollinger, 0)|0|;
+   BollingerInferior := BollingerBands(Desvio, PeriodoBollinger, 0)|1|;
+  
+   DistanciaDaBandaInferior := (fechamento - BollingerInferior); 
+   DistanciaDaBandaSuperior := (BollingerInferior - fechamento); 
+
+   if (TilsonCurto > TilsonLonga) then
+   begin
+         if (HasPosition = False) e (Time > HoraInicio) e (Time < HoraFim) then
+         begin
+               if (fechamento > KeltnerInferior) then
+               begin
+               BuyLimit(KeltnerInferior, QtdMinContratos);
+               end;
+               if (fechamento > BollingerInferior) then
+               begin
+               BuyLimit(BollingerInferior, QtdMinContratos);
+               end;
+         end
+         else if ((minima < KeltnerInferior) ou (minima < BollingerInferior))  e (fechamento > abertura) e (DistanciaDaBandaInferior < 250) then
+         begin
+            BuyLimit(Fechamento, QtdMinContratos);
+            BuyLimit(Fechamento-20, QtdMinContratos);
+            BuyLimit(Fechamento-50, QtdMinContratos);
+            BuyLimit(Fechamento-80, QtdMinContratos);
+            BuyLimit(Fechamento-110, QtdMinContratos);
+            BuyLimit(Fechamento-140, QtdMinContratos);
+            BuyLimit(Fechamento-175, QtdMinContratos);
+            BuyLimit(Fechamento-225, QtdMinContratos);
+         end
+        else if (fechamento > abertura) e (DistanciaDaBandaInferior < 250) then
+         begin
+            BuyLimit(Fechamento, QtdMinContratos);
+            BuyLimit(Fechamento-20, QtdMinContratos);
+            BuyLimit(Fechamento-50, QtdMinContratos);
+            BuyLimit(Fechamento-80, QtdMinContratos);
+            BuyLimit(Fechamento-110, QtdMinContratos);
+            BuyLimit(Fechamento-140, QtdMinContratos);
+            BuyLimit(Fechamento-175, QtdMinContratos);
+            BuyLimit(Fechamento-225, QtdMinContratos);
+         end;
+   end;
+   if (TilsonCurto < TilsonLonga) then
+   begin
+         if (HasPosition = False) e (Time > HoraInicio) e (Time < HoraFim) then
+         begin
+            if (fechamento < KeltnerSuperior) then
+            begin
+               SellShortLimit(KeltnerSuperior, QtdMinContratos);
+            end;
+            if (fechamento < BollingerSuperior) then
+            begin
+               SellShortLimit(BollingerSuperior, QtdMinContratos);
+            end;
+         end
+         else if ((maxima > KeltnerSuperior) ou (maxima > BollingerSuperior )) e (fechamento < abertura) e (DistanciaDaBandaSuperior < 250) then
+         begin
+            SellShortLimit(Fechamento, QtdMinContratos);
+            SellShortLimit(Fechamento-20, QtdMinContratos);
+            SellShortLimit(Fechamento-50, QtdMinContratos);
+            SellShortLimit(Fechamento-80, QtdMinContratos);
+            SellShortLimit(Fechamento-110, QtdMinContratos);
+            SellShortLimit(Fechamento-140, QtdMinContratos);
+            SellShortLimit(Fechamento-175, QtdMinContratos);
+            SellShortLimit(Fechamento-225, QtdMinContratos);
+         end
+         else if (fechamento < abertura) e (DistanciaDaBandaSuperior < 250) then
+         begin
+            SellShortLimit(Fechamento, QtdMinContratos);
+            SellShortLimit(Fechamento-20, QtdMinContratos);
+            SellShortLimit(Fechamento-50, QtdMinContratos);
+            SellShortLimit(Fechamento-80, QtdMinContratos);
+            SellShortLimit(Fechamento-110, QtdMinContratos);
+            SellShortLimit(Fechamento-140, QtdMinContratos);
+            SellShortLimit(Fechamento-175, QtdMinContratos);
+            SellShortLimit(Fechamento-225, QtdMinContratos);
+         end;
+
+   end;
+
+   Plot(BollingerInferior);
+   Se (Time > 1738) então ClosePosition;
+end;               
