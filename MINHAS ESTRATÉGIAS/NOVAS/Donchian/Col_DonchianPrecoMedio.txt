@@ -1,0 +1,43 @@
+input
+Mediacurta(21);
+mediaLonga(66);
+PeriodoDonch(9);
+QtdMinContratos(1);
+var
+MediaMovelCurta, MediaMovelLonga, DonchSuperior, DonchInferior, StopCompra, StopVenda : Float;
+CondicaoCompraUm, CondicaoCompraDois, CondicaoVendaUm, CondicaoVendaDois : boolean;
+begin
+MediaMovelCurta := MediaExp(Mediacurta, Fechamento);
+MediaMovelLonga := MediaExp(mediaLonga, Fechamento);
+
+DonchSuperior := DonchianCh(PeriodoDonch)|1|;
+DonchInferior := DonchianCh(PeriodoDonch)|2|;
+
+if (MediaMovelCurta < MediaMovelLonga) e (Fechamento < MediaMovelLonga) then CondicaoVendaUm  := True else CondicaoVendaUm := false;
+if (MediaMovelCurta < MediaMovelLonga) e (Fechamento > MediaMovelCurta) e (Fechamento < MediaMovelLonga) e (Fechamento < abertura) then CondicaoVendaDois := True else CondicaoVendaDois := false;
+
+
+if (MediaMovelCurta > MediaMovelLonga) e (Fechamento > MediaMovelLonga) then CondicaoCompraUm := True else CondicaoCompraUm := false;
+if (MediaMovelCurta > MediaMovelLonga) e (Fechamento < MediaMovelCurta) e (Fechamento > MediaMovelLonga) e (Fechamento > abertura) then CondicaoCompraDois := True else CondicaoCompraDois := false;
+
+
+
+      if (CondicaoCompraUm = true) e (Fechamento > DonchInferior[5]) then
+      begin
+         PaintBar(ClGreen);
+      end;
+      if (CondicaoCompraDois = True) e (Fechamento > DonchInferior[5]) then
+      begin
+         PaintBar(ClBlue);
+      end;
+
+
+      if (CondicaoVendaUm = true) e (Fechamento < DonchSuperior[5]) then
+      begin
+         PaintBar(ClRed);
+      end;
+      if (CondicaoVendaDois = True) e (Fechamento < DonchSuperior[5]) then
+      begin
+         PaintBar(ClFuchsia);
+      end;
+fim;

@@ -84,14 +84,7 @@ begin
          begin
            BuyToCoverStop(High+Varicao14R, High+Varicao14R+500, SellPosition);
          end
-         else if ((SellPrice - fechamento) > Parcial) e ((SellPrice - fechamento) < StopGain) then
-         begin
-           BuyToCoverStop(SellPrice-Varicao14R, SellPrice-Varicao14R+500, SellPosition);
-         end
-         else if ((SellPrice - fechamento) < Parcial) then 
-         begin
-           BuyToCoverStop(High+Varicao14R, High+Varicao14R+500, SellPosition);
-         end
+         
          else if ((SellPrice - fechamento) > StopGain) then 
          begin
            BuyToCoverStop(High+Varicao14R, High+Varicao14R+500, SellPosition);
@@ -142,14 +135,7 @@ begin
          begin
             SellToCoverStop(Low-Varicao14R, Low-Varicao14R-500, BuyPosition);
          end  
-         else if ((fechamento - BuyPrice) > Parcial) e ((fechamento - BuyPrice) < StopGain) then
-         begin
-            SellToCoverStop(BuyPrice+Varicao14R, BuyPrice+Varicao14R-500, BuyPosition);
-         end
-         else if ((fechamento - BuyPrice) < Parcial) then
-         begin
-           SellToCoverStop(Low-Varicao14R, Low-Varicao14R-500, BuyPosition);
-         end
+         
          else if ((fechamento - BuyPrice) > StopGain) then
          begin
            SellToCoverStop(Low-Varicao14R, Low-Varicao14R-500, BuyPosition);
@@ -167,7 +153,7 @@ begin
          end;
          if (fechamento > BollingerInferior) then
          begin
-           BuyLimit(BollingerInferior, QtdMinContratos);
+           BuyLimit(BollingerInferior-30, QtdMinContratos);
          end;
       end;
       if (BuyPosition > 0) e (BuyPosition < 4) e (Fechamento < BuyPrice) then
@@ -212,7 +198,7 @@ begin
         end;
         if (fechamento < BollingerSuperior) then
         begin
-         SellShortLimit(BollingerSuperior, QtdMinContratos);
+         SellShortLimit(BollingerSuperior+30, QtdMinContratos);
         end;
       end;
       if (SellPosition > 0) e (SellPosition < 4) e (fechamento > SellPrice) then
