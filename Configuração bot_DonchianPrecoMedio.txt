@@ -1,0 +1,15 @@
+bot_DonchianPrecoMedio
+10R
+Quantidade maxima 16
+Horario de entrada 10:00 as 17:40
+
+Saída
+75GainREAIS15
+zerar 17:45:00
+
+Risco
+Ganho 300
+Limite de perda 300
+
+
+

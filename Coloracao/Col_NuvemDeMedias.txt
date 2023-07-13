@@ -1,0 +1,23 @@
+Input
+FatorCurto(0.60);
+PeriodoCurto(9);
+FatorLonga(0.50);
+PeriodoLonga(25);
+
+Var
+MediaMovelCurta, MediaMovelLonga : Float;
+
+Inicio
+   MediaMovelCurta := MediaExp(Mediacurta, Fechamento);
+   MediaMovelLonga := MediaExp(mediaLonga, Fechamento);
+   
+   SetPlotColor(1, clGreen);
+   SetPlotColor(2, clRed);
+   
+   //Indicador Trend-Cloud
+   Se (MediaMovelCurta > MediaMovelLonga) then PaintBar(clAzulClaro)
+   Senão PaintBar(clGray);
+   Plot(MediaMovelCurta);
+   Plot2(MediaMovelLonga);
+ 
+Fim;

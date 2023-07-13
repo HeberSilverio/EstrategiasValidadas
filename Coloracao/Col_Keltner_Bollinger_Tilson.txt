@@ -1,0 +1,66 @@
+// testado o resultado apenas no 14r
+// Colocar 6 contratos por operação
+// 09:00 até 16:00 - zerar as 17:38
+// Perda do dia -450
+//Trend Cloud 0.45 12 0.50 27 | Keltner 1,75 23A   | Bollinger 1,75 - 20A
+
+const
+FatorCurto = 0.45;
+PeriodoCurto = 12;
+FatorLonga = 0.50;
+PeriodoLonga = 27;
+Desvio = 1.75;
+PeriodoKeltner = 23;// Aritmetica
+PeriodoBollinger = 20;// Aritmetica
+HoraInicio = 900;
+HoraFim = 1600;
+
+
+var
+TilsonCurto, TilsonLonga, KeltnerSuperior, KeltnerInferior, BollingerSuperior, BollingerInferior, MaximaDasUltimasTres, MinimaDasUltimasTres : Float;
+
+begin
+   MaximaDasUltimasTres := Highest(High, 3);
+   MinimaDasUltimasTres := Lowest(Low, 3);
+
+   MinimaDasUltimasTres := Lowest(Low, 3);
+   TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+   TilsonLonga := Tilson(FatorLonga, PeriodoLonga); 
+
+   KeltnerSuperior := KeltnerCH(Desvio, PeriodoKeltner, 0)|0|;
+   KeltnerInferior := KeltnerCH(Desvio, PeriodoKeltner, 0)|1|;
+
+   BollingerSuperior := BollingerBands(Desvio, PeriodoBollinger, 0)|0|;
+   BollingerInferior := BollingerBands(Desvio, PeriodoBollinger, 0)|1|;
+
+
+   if (TilsonCurto > TilsonLonga) e (Time < HoraFim) then
+   begin
+      
+      if (minima < KeltnerInferior) then
+      begin
+         PaintBar(ClGreen);
+      end;
+         
+      if (Minima <>> BollingerInferior) then
+      begin
+         PaintBar(clAzulClaro);
+      end;
+      
+      
+   end;
+   
+   if (TilsonCurto < TilsonLonga) e (Time < HoraFim) then
+   begin
+      if (Maxima > KeltnerSuperior) then
+      begin
+         PaintBar(ClRed);
+      end;
+      
+      if (Maxima > BollingerSuperior) then
+      begin
+         PaintBar(clMarrom);
+      end;
+   end;
+   
+end;

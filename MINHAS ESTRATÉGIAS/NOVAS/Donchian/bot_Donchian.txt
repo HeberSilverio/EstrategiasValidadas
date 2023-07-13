@@ -61,4 +61,5 @@ DonchInferior := DonchianCh(PeriodoDonch)|2|;
          StopVenda := Maxima+MinPriceIncrement;
          PaintBar(ClRed);
       end;
+   
 fim;

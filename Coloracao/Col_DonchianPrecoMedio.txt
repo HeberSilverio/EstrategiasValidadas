@@ -1,8 +1,8 @@
 input
 Mediacurta(21);
 mediaLonga(66);
-PeriodoDonch(9);
-QtdMinContratos(1);
+PeriodoDonch(15);
+Deslocamento(2);
 var
 MediaMovelCurta, MediaMovelLonga, DonchSuperior, DonchInferior, StopCompra, StopVenda : Float;
 CondicaoCompraUm, CondicaoCompraDois, CondicaoVendaUm, CondicaoVendaDois : boolean;
@@ -20,23 +20,21 @@ if (MediaMovelCurta < MediaMovelLonga) e (Fechamento > MediaMovelCurta) e (Fecha
 if (MediaMovelCurta > MediaMovelLonga) e (Fechamento > MediaMovelLonga) then CondicaoCompraUm := True else CondicaoCompraUm := false;
 if (MediaMovelCurta > MediaMovelLonga) e (Fechamento < MediaMovelCurta) e (Fechamento > MediaMovelLonga) e (Fechamento > abertura) then CondicaoCompraDois := True else CondicaoCompraDois := false;
 
-
-
-      if (CondicaoCompraUm = true) e (Fechamento > DonchInferior[5]) then
+      if (CondicaoCompraUm = true) e (Fechamento > DonchInferior[Deslocamento]) then
       begin
          PaintBar(ClGreen);
       end;
-      if (CondicaoCompraDois = True) e (Fechamento > DonchInferior[5]) then
+      if (CondicaoCompraDois = True) e (Fechamento > DonchInferior[Deslocamento]) then
       begin
          PaintBar(ClBlue);
       end;
 
 
-      if (CondicaoVendaUm = true) e (Fechamento < DonchSuperior[5]) then
+      if (CondicaoVendaUm = true) e (Fechamento < DonchSuperior[Deslocamento]) then
       begin
          PaintBar(ClRed);
       end;
-      if (CondicaoVendaDois = True) e (Fechamento < DonchSuperior[5]) then
+      if (CondicaoVendaDois = True) e (Fechamento < DonchSuperior[Deslocamento]) then
       begin
          PaintBar(ClFuchsia);
       end;

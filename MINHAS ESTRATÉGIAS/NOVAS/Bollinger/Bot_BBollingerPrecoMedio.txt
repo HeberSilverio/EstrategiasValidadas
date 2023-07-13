@@ -1,0 +1,65 @@
+// Utilizar no 10R
+// Utilizar ordens OCO 55Gain65Loss
+input
+Mediacurta(21);
+mediaLonga(66);
+Desvio(1.75);
+QtdMinContratos(1);
+PeriodoBollinger(38);
+var
+MediaMovelCurta, MediaMovelLonga, BollingerSuperior, BollingerInferior, StopCompra, StopVenda : Float;
+CondicaoCompraUm, CondicaoCompraDois, CondicaoVendaUm, CondicaoVendaDois : boolean;
+begin
+MediaMovelCurta := MediaExp(Mediacurta, Fechamento);
+MediaMovelLonga := MediaExp(mediaLonga, Fechamento);
+
+BollingerSuperior := BollingerBands(Desvio, PeriodoBollinger, 0)|0|;
+BollingerInferior := BollingerBands(Desvio, PeriodoBollinger, 0)|1|;
+
+   if (MediaMovelCurta < MediaMovelLonga) e (Fechamento < BollingerSuperior) then CondicaoVendaUm  := True else CondicaoVendaUm := false;
+   if (MediaMovelCurta < MediaMovelLonga) e (Fechamento > MediaMovelCurta) e (Fechamento < BollingerSuperior) e (Fechamento < abertura) then CondicaoVendaDois := True else CondicaoVendaDois := false;
+
+
+   if (MediaMovelCurta > MediaMovelLonga) e (Fechamento > BollingerInferior) then CondicaoCompraUm := True else CondicaoCompraUm := false;
+   if (MediaMovelCurta > MediaMovelLonga) e (Fechamento < MediaMovelCurta) e (Fechamento > abertura) then CondicaoCompraDois := True else CondicaoCompraDois := false; 
+
+    if (IsBought) e ((fechamento < BollingerInferior-35) ou (CondicaoVendaDois = True))  then
+         ReversePosition;
+    if (IsSold) e ((fechamento > BollingerSuperior+35) ou (CondicaoCompraDois = True)) then
+         ReversePosition; 
+     
+
+     if (SellPosition = 0) then
+     begin
+        if (CondicaoCompraUm = true) e (Fechamento < Abertura) then
+        begin
+           BuyAtMarket(QtdMinContratos);
+        end;
+        if (CondicaoCompraUm = true) e (Fechamento > Abertura) then
+        begin
+           BuyLimit(Abertura+MinPriceIncrement, QtdMinContratos);
+        end;
+  
+        if (CondicaoCompraDois = True) e (Fechamento > BollingerInferior) then
+        begin
+           BuyAtMarket;
+        end;
+    end;
+
+    if (BuyPosition = 0) then
+        if (CondicaoVendaUm = true) e (Fechamento > Abertura) then
+        begin
+           SellShortAtMarket(QtdMinContratos);
+        end;
+        if (CondicaoVendaUm = true)  e (Fechamento < Abertura) then
+        begin
+           SellShortLimit(Abertura-MinPriceIncrement, QtdMinContratos);
+        end;
+  
+        if (CondicaoVendaDois = True) then
+        begin
+           SellShortAtMarket(QtdMinContratos);
+        end;
+    
+    end;  
+fim;

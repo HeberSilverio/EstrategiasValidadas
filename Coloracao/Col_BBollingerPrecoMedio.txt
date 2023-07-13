@@ -1,0 +1,43 @@
+input
+Mediacurta(21);
+mediaLonga(66);
+PeriodoBollinger(38);
+Deslocamento(2);
+Desvio(1.75);
+var
+MediaMovelCurta, MediaMovelLonga, BollingerSuperior, BollingerInferior : Float;
+CondicaoCompraUm, CondicaoCompraDois, CondicaoVendaUm, CondicaoVendaDois : boolean;
+begin
+
+MediaMovelCurta := MediaExp(Mediacurta, Fechamento);
+MediaMovelLonga := MediaExp(mediaLonga, Fechamento);
+
+BollingerSuperior := BollingerBands(Desvio, PeriodoBollinger, 0)|0|;
+BollingerInferior := BollingerBands(Desvio, PeriodoBollinger, 0)|1|;
+
+if (MediaMovelCurta < MediaMovelLonga) e (Fechamento < BollingerSuperior) then CondicaoVendaUm  := True else CondicaoVendaUm := false;
+if (MediaMovelCurta < MediaMovelLonga) e (Fechamento > MediaMovelCurta) e (Fechamento < BollingerSuperior) e (Fechamento < abertura) then CondicaoVendaDois := True else CondicaoVendaDois := false;
+
+
+if (MediaMovelCurta > MediaMovelLonga) e (Fechamento > BollingerInferior) then CondicaoCompraUm := True else CondicaoCompraUm := false;
+if (MediaMovelCurta > MediaMovelLonga) e (Fechamento < MediaMovelCurta) e (Fechamento > BollingerInferior) e (Fechamento > abertura) then CondicaoCompraDois := True else CondicaoCompraDois := false;
+
+      if (CondicaoCompraUm = true) e (Fechamento > BollingerInferior) then
+      begin
+         PaintBar(ClGreen);
+      end;
+      if (CondicaoCompraDois = True) e (Fechamento > BollingerInferior) then
+      begin
+         PaintBar(ClBlue);
+      end;
+
+
+      if (CondicaoVendaUm = true) e (Fechamento < BollingerSuperior) then
+      begin
+         PaintBar(ClRed);
+      end;
+      if (CondicaoVendaDois = True) e (Fechamento < BollingerSuperior) then
+      begin
+         PaintBar(ClFuchsia);
+      end;
+fim;
