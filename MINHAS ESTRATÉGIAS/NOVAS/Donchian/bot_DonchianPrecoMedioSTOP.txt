@@ -1,0 +1,86 @@
+// Utilizar no 8Pt
+// Utilizar ordens OCO 55Gain65Loss
+input
+Mediacurta(21);
+mediaLonga(66);
+PeriodoDonch(15);
+QtdMinContratos(1);
+Deslocamento(3);
+StopLoss(75);
+var
+MediaMovelCurta, MediaMovelLonga, DonchSuperior, DonchInferior, StopCompra, StopVenda, AbaixoDaCompra, AcimaDaVenda : Float;
+CondicaoCompraUm, CondicaoCompraDois, CondicaoVendaUm, CondicaoVendaDois : boolean;
+begin
+   MediaMovelCurta := MediaExp(Mediacurta, Fechamento);
+   MediaMovelLonga := MediaExp(mediaLonga, Fechamento);
+
+   DonchSuperior := DonchianCh(PeriodoDonch)|1|;
+   DonchInferior := DonchianCh(PeriodoDonch)|2|;
+
+  if (MediaMovelCurta < MediaMovelLonga) e (Fechamento < MediaMovelLonga) then CondicaoVendaUm  := True else CondicaoVendaUm := false;
+  if (MediaMovelCurta < MediaMovelLonga) e (Fechamento > MediaMovelCurta) e (Fechamento < MediaMovelLonga) e (Fechamento < abertura) then CondicaoVendaDois := True else CondicaoVendaDois := false;
+
+
+  if (MediaMovelCurta > MediaMovelLonga) e (Fechamento > MediaMovelLonga) then CondicaoCompraUm := True else CondicaoCompraUm := false;
+  if (MediaMovelCurta > MediaMovelLonga) e (Fechamento < MediaMovelCurta) e (Fechamento > MediaMovelLonga) e (Fechamento > abertura) then CondicaoCompraDois := True else CondicaoCompraDois := false;    
+
+   if (close < BuyPrice) then AbaixoDaCompra := (BuyPrice - fechamento) else AbaixoDaCompra := 0;
+   if (close > SellPrice) then AcimaDaVenda := (fechamento - SellPrice) else AcimaDaVenda := 0;
+
+   if (IsBought) then
+   begin
+      if (Fechamento < BuyPrice) then
+      begin 
+         if (AbaixoDaCompra > StopLoss) then
+            ReversePosition;
+      end;
+      if (CondicaoVendaDois = True) then
+         ReversePosition;
+   end;
+
+   if (IsSold) then
+   begin
+      if (Fechamento > SellPrice) then
+      begin 
+         if (AcimaDaVenda > StopLoss) then
+            ReversePosition;
+      end;
+      if (CondicaoCompraDois = True) then
+         ReversePosition;
+   end;
+        
+
+     if (SellPosition = 0) then
+     begin
+        if (CondicaoCompraUm = true) e (Fechamento > DonchInferior[Deslocamento]) e (Fechamento < Abertura) then
+        begin
+           BuyAtMarket(QtdMinContratos);
+        end;
+        if (CondicaoCompraUm = true) e (Fechamento > DonchInferior[Deslocamento]) e (Fechamento > Abertura) then
+        begin
+           BuyLimit(Abertura+MinPriceIncrement, QtdMinContratos);
+        end;
+  
+        if (CondicaoCompraDois = True) e (Fechamento > DonchInferior[Deslocamento]) then
+        begin
+           BuyAtMarket;
+        end;
+    end;
+
+    if (BuyPosition = 0) then
+        if (CondicaoVendaUm = true) e (Fechamento < DonchSuperior[Deslocamento]) e (Fechamento > Abertura) then
+        begin
+           SellShortAtMarket(QtdMinContratos);
+        end;
+        if (CondicaoVendaUm = true) e (Fechamento < DonchSuperior[Deslocamento]) e (Fechamento < Abertura) then
+        begin
+           SellShortLimit(Abertura-MinPriceIncrement, QtdMinContratos);
+        end;
+  
+        if (CondicaoVendaDois = True) e (Fechamento < DonchSuperior[Deslocamento]) then
+        begin
+           SellShortAtMarket(QtdMinContratos);
+        end;
+    
+    end;  
+fim;

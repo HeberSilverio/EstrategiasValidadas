@@ -1,0 +1,12 @@
+
+alvo 17,5pts
+
+Parcial 13pts
+
+
+Entrada precisa ser 1,5 atrás das bandas (talvez subir desvio  das bandas para 1,85)
+stop 7pts (ou 7?)
+
+horário de entrada até 15:00:00
+BandasBollinger Desv1,90 perio20 A
+KeltnerChannels desv1,90 perio23A
