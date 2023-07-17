@@ -1,0 +1,35 @@
+// Modelo de código clube do robô
+
+var
+sinalC,sinalv,stopC,stopV : booleano;
+cor : inteiro
+
+INICIO
+   //PASSO 1 | CARREGAR INDICADORES
+   // Colocar aqui os indicadores necessários
+
+   PASSO 2 | SINAIS DE ENTRADA
+   //sinalC := //sinal de entrada de compra
+   //sinalV := //sinal de entrada de venda
+
+   PASSO 3 | SINAIS DE SAÍDAS
+   //stopC := 
+   //stopV :=
+
+
+   //EXECUÇÃO DE ENTRADA
+   se (sinalC) e (not HasPosition) entao BuyToCoverAtMarket
+   senao se (sinalV) e (not HasPosition) entao SellShortAtMarket;
+
+   //EXECUÇÃO DE SAÍDA
+   se (IsBought) e (stopC) entao SellToCoverAtMarket
+   senao se (IsSold) e (stopV) entao BuyToCoverAtMarket;
+
+   //COLORAÇÃO
+   se sinalC entao cor := cllime
+   senao se sinalV entao cor := clred
+   senao cor := clwhite;
+   se (cor[1] = cllime) e (not stopC) entao cor:=cllime;
+   se (cor[1] = clred) e (not stopV) entao cor:=clred;
+   PaintBar(cor);
+FIM;

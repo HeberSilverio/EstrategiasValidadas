@@ -1,0 +1,71 @@
+// Inserir indicar prior cote e configurar para máxima e mínima do dia anterior
+input
+QtdMinContratos(1);
+
+PARAMETRO
+PercentualFiboC(38);
+PercentualFiboV(38);
+
+
+VAR
+sinalC,sinalv,stopC,stopV : booleano;
+cor : inteiro
+maximaDiaAnterior, minimaDiaAnterior, vlrFiboCompra, vlrFiboVenda, vlrStopC, vlrStopV : real;
+
+INICIO
+   //PASSO 1 | CARREGAR INDICADORES
+   maximaDiaAnterior := PriorCote(2);
+   minimaDiaAnterior := PriorCote(3);
+   vlrFiboCompra := minimaDiaAnterior + ((maximaDiaAnterior-minimaDiaAnterior)*(PercentualFiboC/100));
+   vlrFiboVenda := maximaDiaAnterior - ((maximaDiaAnterior-minimaDiaAnterior)*(PercentualFiboV/100));
+
+   PASSO 2 | SINAIS DE ENTRADA
+   sinalC := (minima < minimaDiaAnterior) e (maxima > minimaDiaAnterior) e (maxima < vlrFiboCompra) e (time < 1640); //sinal de entrada de Compra
+   sinalV := (minima < maximaDiaAnterior) e (maxima > maximaDiaAnterior) e (minima > vlrFiboVenda) e (time < 1640); //sinal de entrada de venda
+
+   PASSO 3 | SINAIS DE SAÍDAS
+   //stopC := 
+   //stopV :=
+
+
+   //EXECUÇÃO DE ENTRADA
+   se (sinalC) e (not HasPosition) entao BuyStop(High+MinPriceIncrement, High+MinPriceIncrement+(20*MinPriceIncrement), QtdMinContratos)
+   senao se (sinalV) e (not HasPosition) entao SellShortStop(Low-MinPriceIncrement, Low-MinPriceIncrement-(20*MinPriceIncrement), BuyPosition);
+
+   //OCO
+   se (IsBought) entao
+   inicio
+      vlrStopC := (BuyPrice - (vlrFiboCompra - BuyPrice)); //Local do stop de compra
+      SellToCoverLimit(vlrFiboCompra); //Gain da compra
+      SellToCoverStop(vlrStopC,vlrStopC-(20*MinPriceIncrement));// Stop Loss
+      se (fechamento > vlrFiboCompra) ou (fechamento < vlrStopC) entao ClosePosition; //proteção contra gap
+   fim
+   senao se (IsSold) entao
+   inicio
+      vlrStopV := (SellPrice + (SellPrice - vlrFiboVenda));  //Local do stop de venda
+      BuyToCoverLimit(vlrFiboVenda); //Gain da compra
+      BuyToCoverStop(vlrStopV,vlrStopV+(20*MinPriceIncrement));// Stop Loss
+      se (fechamento < vlrFiboVenda) ou (fechamento > vlrStopV) entao ClosePosition; //proteção contra gap
+   fim;
+
+   //SAÍDA POR HORÁRIO
+   se (HasPosition) e (time >=1735) entao ClosePosition;
+
+   //COLORAÇÃO
+   se sinalC entao PaintBar(cllime) 
+   senao se sinalV entao PaintBar (clred);
+   
+
+   //Plotagem
+   plot(maximaDiaAnterior);
+   SetPlotColor(1, clyellow);
+   Plot2(minimaDiaAnterior);
+   SetPlotColor(2, clblue);
+
+   //Para retirar a linha que liga o prior cote de um dia para o outro
+   se (ContadorDeCandle = 1) entao
+   inicio
+      noplot(1);
+      noplot(2);
+   fim;
+FIM;
