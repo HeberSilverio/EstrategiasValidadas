@@ -1,0 +1,194 @@
+//A2 A banda de Bollinger superior que está a 2 desvios padrão da linha X (MMA20)
+//A1 A linha superior da banda de Bollinger que é 1 desvio padrão da linha X (MMA20)
+//X É a MMA20 períodos do gráfico, serve como o centro das bandas de Bollinger duplas
+//B1 A linha inferior da Banda Bollinger que é 1 desvio padrão da linha X (MMA20)
+//B2 A banda de Bollinger inferior que está a 2 desvios padrão da linha 
+//A Buy Zone (zona de compra) é entre as linhas A1 e A2
+//A Zona Neutra 1 é entre as linhas A2 e X
+//A Zona Neutra 2 é entre as linhas X e B1
+//A Sell Zone (Zona de Venda) é entre as linhas B1 e B2
+const
+HoraInicio = 0859;
+HoraFim = 1600;
+FatorCurto = 0.45;
+PeriodoCurto = 12;
+FatorLonga = 0.50;
+PeriodoLonga = 27;
+DesvioUm = 1;
+DesvioDois = 2;
+PeriodoUm = 20;
+PeriodoDois = 21;
+PeriodoExp = 30;
+
+Input
+StopParcialApartir(40);
+QtdMinContratos(1);
+
+Var
+TilsonCurto, TilsonLonga, BandaSuperiorA1, BandaSuperiorA2, BandaInferiorB1, BandaInferiorB2, MediaAritmeticaX,  MaximaDasUltimasTres, MinimaDasUltimasTres, VariacaoStop, StopLoss, AbaixoDaCompra, AcimaDaVenda : Float;
+sinalCompraUm,sinalCompraDois, sinalCompraTres, sinalVendaUm, sinalVendaDois, sinalVendaTres, StopC, StopV : boolean;
+cor : inteiro;
+Inicio
+    //CARREGAR O INDICADOR
+    BandaSuperiorA2 := BollingerBands(DesvioDois, PeriodoDois, 0)|0|;
+    BandaSuperiorA1 := BollingerBands(DesvioUm, PeriodoUm, 0)|0|;
+    MediaAritmeticaX := MediaExp(PeriodoExp, Close);
+    BandaInferiorB1 := BollingerBands(DesvioUm, PeriodoUm, 0)|1|;
+    BandaInferiorB2 := BollingerBands(DesvioDois, PeriodoDois, 0)|1|;
+    TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+    TilsonLonga := Tilson(FatorLonga, PeriodoLonga); 
+    
+    //SINAIS DE ENTRADA
+    sinalCompraUm := (fechamento < BandaInferiorB1) e (MediaAritmeticaX > MediaAritmeticaX[1]) ou ((fechamento > abertura) e (fechamento < BandaInferiorB1));
+    sinalCompraDois := (fechamento > abertura) e (MediaAritmeticaX > MediaAritmeticaX[1]) e (fechamento > BandaInferiorB1);
+    sinalCompraTres := (fechamento > BandaSuperiorA1) e (fechamento > abertura);
+
+    sinalVendaUm := (fechamento > BandaSuperiorA1) e (MediaAritmeticaX < MediaAritmeticaX[1]) ou ((fechamento < abertura) e (fechamento > BandaSuperiorA1));
+    sinalVendaDois := (fechamento < abertura) e (MediaAritmeticaX < MediaAritmeticaX[1]) e (fechamento < BandaSuperiorA1);
+    sinalVendaTres := (fechamento < BandaInferiorB1) e (fechamento < abertura);
+
+   //SINAIS DE STOP
+   MaximaDasUltimasTres := Highest(High, 3);
+   MinimaDasUltimasTres := Lowest(Low, 3);
+   VariacaoStop := ((GraphicOffset*MinPriceIncrement)-(MinPriceIncrement*2));
+   StopLoss := (((GraphicOffset*MinPriceIncrement)*2)+(MinPriceIncrement*5));
+   if (close < BuyPrice) then AbaixoDaCompra := (BuyPrice - fechamento) else AbaixoDaCompra := 0;
+   if (close > SellPrice) then AcimaDaVenda := (fechamento - SellPrice) else AcimaDaVenda := 0;
+
+   
+
+    //EXECUÇÃO DE ENTRADA
+   if (TilsonCurto > TilsonLonga) e (Time > HoraInicio) e (Time < HoraFim) then
+   begin
+      se (sinalCompraUm) e (not HasPosition)  then
+      begin
+         BuyAtMarket(QtdMinContratos*2);
+      end;
+      se (sinalCompraUm) then
+      begin
+         PaintBar(ClBlue);
+      end;
+
+      se (sinalCompraDois) e (not HasPosition) then
+      begin
+         BuyLimit(Fechamento+MinPriceIncrement, QtdMinContratos*2);
+      end;
+      se (sinalCompraDois) then
+      begin
+         PaintBar(ClLime);
+      end;
+
+      if (BuyPosition > 0) e (BuyPosition < (QtdMinContratos*4)) e (Fechamento > BuyPrice) e ((Fechamento - BuyPrice) < (VariacaoStop*5)) then
+      begin 
+         if (fechamento > abertura) then
+         begin
+            BuyLimit(Abertura, QtdMinContratos);
+         end;
+         if (sinalCompraDois) then
+         begin
+            BuyLimit(Fechamento+MinPriceIncrement, QtdMinContratos);
+         end;
+         if (fechamento > BandaInferiorB1) then
+         begin
+             BuyLimit(BandaInferiorB1, QtdMinContratos);
+         end;
+         if (fechamento > MediaAritmeticaX) then
+         begin
+             BuyLimit(MediaAritmeticaX, QtdMinContratos);
+         end;
+      end;
+      if (sinalCompraTres) then
+      begin
+         PaintBar(ClGreen);
+      end;
+   end;
+
+   if (TilsonCurto < TilsonLonga) e (Time > HoraInicio) e (Time < HoraFim) then
+   begin
+      se (sinalVendaUm) e (not HasPosition)  entao
+      begin
+         SellShortAtMarket(QtdMinContratos*2);
+      end;
+      se (sinalVendaUm) entao
+      begin
+         PaintBar(ClFuchsia);
+      end;
+
+      se (sinalVendaDois) e (not HasPosition) entao
+      begin
+         SellShortLimit(fechamento-MinPriceIncrement, QtdMinContratos*2);
+      end;
+      se (sinalVendaDois) entao
+      begin
+         PaintBar(ClRed);
+      end;
+
+      if (SellPosition > 0) e (SellPosition < (QtdMinContratos*4)) e ((SellPrice - fechamento) < (VariacaoStop*5)) then
+      begin
+         if (fechamento < abertura) then
+         begin
+            SellShortLimit(Abertura-MinPriceIncrement, QtdMinContratos);
+         end;
+         if (sinalVendaDois) then
+         begin
+            SellShortLimit(fechamento-MinPriceIncrement, QtdMinContratos);
+         end;
+         if (fechamento < BandaSuperiorA1) then
+         begin
+             SellShortLimit(BandaSuperiorA1, QtdMinContratos);
+         end;
+         if (fechamento < MediaAritmeticaX) then
+         begin
+             SellShortLimit(MediaAritmeticaX, QtdMinContratos);
+         end;
+      end;
+      
+         
+      se (sinalVendaTres) e (Time > HoraInicio) e (Time < HoraFim) entao
+      begin
+         PaintBar(ClMaroon);
+      end;
+   end;
+
+   //EXECUÇÃO DE SAÍDA
+   se (IsBought)  entao 
+   begin
+      if (Fechamento < BuyPrice) then
+      begin 
+         if (AbaixoDaCompra > StopLoss) then
+         begin
+            SellToCoverAtMarket(BuyPosition);
+         end;
+      end;
+      if (fechamento > BuyPrice) e (abertura > minima[4]) e (maxima < MaximaDasUltimasTres) e (fechamento[2] > fechamento[3]) then
+      begin
+         If ((fechamento - BuyPrice) > StopParcialApartir) then
+         begin
+            SellToCoverStop(Low-VariacaoStop, Low-VariacaoStop-(60*MinPriceIncrement), BuyPosition);
+         end;  
+      end;
+      //PROTEÇÃO EM GAP
+      //se (StopLossCompra > StopLoss) entao ClosePosition; //proteção contra gap (nesse robô está redundante)
+   end;
+   se (IsSold) then
+   begin
+      if (Fechamento > SellPrice) then
+      begin 
+         if (AcimaDaVenda > StopLoss) then
+         begin
+            BuyToCoverAtMarket(SellPosition);
+         end;
+      end;
+      If (fechamento < SellPrice) e (abertura < maxima[4]) e (Minima > MinimaDasUltimasTres) e (fechamento[2] < fechamento[3]) then
+      begin
+         If ((SellPrice - fechamento) > StopParcialApartir) then
+         begin
+           BuyToCoverStop(High+VariacaoStop, High+VariacaoStop+(60*MinPriceIncrement), SellPosition);
+         end;
+      end;
+   end;
+    
+    //SAÍDA POR HORÁRIO
+   se (HasPosition) e (time >=1735) entao ClosePosition;
+
+Fim;

@@ -1,0 +1,75 @@
+//considera a máxima e minima de 8 períodos
+// entra no meio da barra que fecha fora do intervalo
+
+Input
+PeriodoMedia(8);
+PeriodoParaSaida(2);
+QtdMinContratos(1);
+
+VAR
+mediaMaximas, mediaMinimas, precoMedio, vlrRange, stopC, stopV : float;
+sinalC, sinalV : booleano;
+cor : inteiro;
+
+Inicio
+   mediaMaximas := Media(PeriodoMedia, maxima);
+   mediaMinimas := Media(PeriodoMedia, minima);
+   precoMedio := Round((maxima+minima)/2);
+
+   //SINAIS DE ENTRADA
+   sinalC := (fechamento < abertura) e (fechamento < precoMedio) e (fechamento < mediaMinimas);
+   sinalV := (fechamento > abertura) e (fechamento > precoMedio) e (fechamento > mediaMaximas);
+
+   //SINAIS DE SAÍDAS
+   vlrRange := (maxima-minima);
+   stopC := (BuyPrice-vlrRange);
+   stopV := (SellPrice+vlrRange);
+
+   //OCO
+   se (IsBought) entao
+   inicio
+      SellToCoverLimit(Highest(High, PeriodoParaSaida)); //Gain da compra
+      
+      SellToCoverStop(stopC, stopC-(60*MinPriceIncrement));// Stop Loss
+
+      se (fechamento < StopC) entao ClosePosition; //proteção contra gap
+   fim;
+   se (IsSold) entao
+   inicio
+      BuyToCoverLimit(Lowest(Low,PeriodoParaSaida)); //Gain da compra
+
+      BuyToCoverStop(StopV, StopV+(60*MinPriceIncrement));// Stop Loss
+
+      se (fechamento > StopV) entao ClosePosition; //proteção contra gap
+   fim;
+
+   
+   se (not HasPosition) e (sinalC) entao
+   inicio
+      BuyStop(precoMedio, precoMedio+(10*MinPriceIncrement), QtdMinContratos);
+   fim;
+   se (not HasPosition) e (sinalV) entao
+   inicio
+      SellShortStop(precoMedio, precoMedio-(10*MinPriceIncrement), QtdMinContratos);
+   fim;
+
+   //COLORAÇÃO
+   se sinalC entao PaintBar(clGreen);
+   se sinalV entao PaintBar (clred);
+   
+   //Plotagem
+   //Plot(precoMedio);
+   //SetPlotColor(1, ClFucsia);
+   //SetPlotWidth(1, 2);
+
+   Plot2(mediaMaximas);
+   SetPlotColor(2, ClRed);
+   SetPlotWidth(2, 2);
+
+   Plot3(mediaMinimas);
+   SetPlotColor(3, ClGren);
+   SetPlotWidth(3, 2);
+
+   //SAÍDA POR HORÁRIO
+   se (HasPosition) e (time >=1735) entao ClosePosition;
+Fim;

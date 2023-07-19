@@ -1,0 +1,42 @@
+// Modelo de código clube do robô
+
+input
+FatorDeAceleracao(0.02);
+LimiteAceleracao(0.20);
+var
+sinalC,sinalv,stopC,stopV : booleano;
+pSAR : float;
+
+INICIO
+   //PASSO 1 | CARREGAR INDICADORES
+   pSAR := ParabolicSAR(FatorDeAceleracao,LimiteAceleracao);
+
+   PASSO 2 | SINAIS DE ENTRADA
+   sinalC := (Fechamento[1] < pSAR[1]) e (Fechamento[0] > pSAR[0]);//sinal de entrada de compra
+   sinalV := (Fechamento[1] > pSAR[1]) e (Fechamento[0] < pSAR[0]);//sinal de entrada de venda
+
+   PASSO 3 | SINAIS DE SAÍDAS
+   //stopC := 
+   //stopV :=
+
+
+   //EXECUÇÃO DE ENTRADA
+   se (sinalC) e (not HasPosition) entao BuyAtMarket
+   senao se (sinalV) e (not HasPosition) entao SellShortAtMarket;
+
+   //EXECUÇÃO DE SAÍDA
+   se (IsBought) e (stopC) entao ReversePosition
+   senao se (IsSold) e (stopV) entao ReversePosition;
+
+   //COLORAÇÃO
+   se (Fechamento > pSAR) entao cor := cllime
+   senao se (Fechamento < pSAR) entao cor := clred
+   senao cor := clwhite;
+   se (cor[1] = cllime) e (not stopC) entao cor:=cllime;
+   se (cor[1] = clred) e (not stopV) entao cor:=clred;
+   PaintBar(cor);
+
+   //SINALIZAÇÃO DAS ENTRADAS
+   se sinalC entao PlotText("C", cllime,0,15);
+   se sinalV entao PlotText("V", clred,2,10);
+FIM;

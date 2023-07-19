@@ -2,7 +2,7 @@
 
 var
 sinalC,sinalv,stopC,stopV : booleano;
-cor : inteiro
+cor : inteiro;
 
 INICIO
    //PASSO 1 | CARREGAR INDICADORES
