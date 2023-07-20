@@ -1,0 +1,65 @@
+input
+Mediacurta(21);
+mediaLonga(66);
+PeriodoDonch(9);
+QtdMinContratos(1);
+var
+MediaMovelCurta, MediaMovelLonga, DonchSuperior, DonchInferior, StopCompra, StopVenda : Float;
+
+begin
+MediaMovelCurta := MediaExp(Mediacurta, Fechamento);
+MediaMovelLonga := MediaExp(mediaLonga, Fechamento);
+
+DonchSuperior := DonchianCh(PeriodoDonch)|1|;
+DonchInferior := DonchianCh(PeriodoDonch)|2|;
+
+   if (IsBought) then
+   begin
+      if (BuyPosition = 2) then
+      begin
+         SellToCoverLimit(DonchSuperior, QtdMinContratos); //Gain
+
+         SellToCoverStop(StopCompra, StopCompra-200, BuyPosition); // Stop Loss
+      begin
+      if (BuyPosition = 1) then
+      begin
+         SellToCoverStop(High[4], High[4]-500, QtdMinContratos); //Gain
+         
+
+         SellToCoverStop(StopCompra, StopCompra-200, BuyPosition);// Stop Loss
+      begin
+   end;
+
+   if (IsSold) then
+   begin
+      if (SellPosition = 2) then
+      begin
+         BuyToCoverLimit(DonchInferior, QtdMinContratos); //Gain
+         BuyToCoverStop(StopVenda, StopVenda+100, SellPosition); //Stop Loss  
+      end;
+      if (SellPosition = 1) then
+      begin
+         BuyToCoverStop(Low[4], Low[4]+500, QtdMinContratos); //Gain
+         BuyToCoverStop(StopVenda, StopVenda+100, SellPosition); //Stop Loss  
+      end;
+
+   end;
+
+
+   if (HasPosition = False) then
+   begin
+      if (MediaMovelCurta > MediaMovelLonga) e (minima < DonchInferior) e (fechamento > Abertura) then
+      begin
+         BuyAtMarket;
+         StopCompra := Minima-MinPriceIncrement;
+         PaintBar(ClGreen);
+      end;
+
+      if (MediaMovelCurta < MediaMovelLonga) e (maxima > DonchInferior) e (fechamento < Abertura) then
+      begin
+         SellShortAtMarket;
+         StopVenda := Maxima+MinPriceIncrement;
+         PaintBar(ClRed);
+      end;
+   
+fim;
