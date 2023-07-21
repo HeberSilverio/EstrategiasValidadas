@@ -1,0 +1,56 @@
+const
+HoraInicio = 0859;
+HoraFim = 1600;
+input
+Mediacurta(25);
+mediaLonga(70);
+PeriodoDonchUm(3); 
+PeriodoDonchDois(20);
+DeslocamentoUm(1);
+DeslocamentoDois(2);
+
+var
+MediaMovelCurta, MediaMovelLonga, DonchSuperiorUm, DonchSuperiorDois, DonchInferiorUm, DonchInferiorDois, StopCompra, StopVenda : Float;
+CondicaoCompraUm, CondicaoCompraDois, CondicaoCompraTres, CondicaoVendaUm, CondicaoVendaDois, CondicaoVendaTres : boolean;
+begin
+MediaMovelCurta := Media(Mediacurta, Abertura);
+MediaMovelLonga := Media(mediaLonga, Fechamento);
+
+DonchSuperiorUm := DonchianCh(PeriodoDonchUm)|1|;
+DonchInferiorUm := DonchianCh(PeriodoDonchUm)|2|;
+DonchSuperiorDois := DonchianCh(PeriodoDonchDois)|1|;
+DonchInferiorDois := DonchianCh(PeriodoDonchDois)|2|;
+
+if (Fechamento < DonchInferiorUm[DeslocamentoUm]) then CondicaoVendaUm  := True else CondicaoVendaUm := false;
+
+if (MediaMovelCurta < MediaMovelLonga) e (Fechamento > MediaMovelCurta) e (Fechamento < abertura) then CondicaoVendaDois := True else CondicaoVendaDois := false;
+if (Fechamento[1] > DonchSuperiorDois[DeslocamentoDois]) e (Fechamento < DonchSuperiorDois[DeslocamentoDois]) then CondicaoVendaTres := True else CondicaoVendaTres := false;
+
+
+if (Fechamento > DonchSuperiorUm[DeslocamentoUm]) then CondicaoCompraUm := True else CondicaoCompraUm := false;
+
+if (MediaMovelCurta > MediaMovelLonga) e (Fechamento < MediaMovelCurta) e (Fechamento > abertura) then CondicaoCompraDois := True else CondicaoCompraDois := false;
+if (Fechamento[1] < DonchInferiorDois[DeslocamentoDois]) e (Fechamento > DonchInferiorDois[DeslocamentoDois]) then CondicaoCompraTres := True else CondicaoCompraTres := false;
+
+    if (Time > HoraInicio) e (Time < HoraFim) then
+    begin
+      if (CondicaoCompraUm = true) then
+      begin
+         PaintBar(ClGreen);
+      end;
+      if (CondicaoCompraDois = True) e (CondicaoCompraTres = True) then
+      begin
+         PaintBar(ClBlue);
+      end;
+
+
+      if (CondicaoVendaUm = true) then
+      begin
+         PaintBar(ClRed);
+      end;
+      if (CondicaoVendaDois = True) e (CondicaoVendaTres = True) then
+      begin
+         PaintBar(ClFuchsia);
+      end;
+   end;
+fim;
