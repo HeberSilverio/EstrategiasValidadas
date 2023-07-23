@@ -1,6 +1,9 @@
+//Dia 29/06 seria um dia de stop loss diário testar loss diário
+// Melhor condição parece ser no 8R
+
 const
 HoraInicio = 0859;
-HoraFim = 1600;
+HoraFim = 1800;
 input
 Mediacurta(25);
 mediaLonga(70);
@@ -10,12 +13,13 @@ DeslocamentoUm(1);
 DeslocamentoDois(2);
 
 var
-MediaMovelCurta, MediaMovelLonga, DonchSuperiorUm, DonchSuperiorDois, DonchInferiorUm, DonchInferiorDois, StopCompra, StopVenda : Float;
+MediaMovelCurta, MediaMovelLonga, DonchSuperiorUm, DonchSuperiorDois, DonchInferiorUm, DonchInferiorDois, StopCompra, StopVenda, MediaDonchUm : Float;
 CondicaoCompraUm, CondicaoCompraDois, CondicaoCompraTres, CondicaoVendaUm, CondicaoVendaDois, CondicaoVendaTres : boolean;
 begin
 MediaMovelCurta := Media(Mediacurta, Abertura);
 MediaMovelLonga := Media(mediaLonga, Fechamento);
 
+MediaDonchUm := DonchianCh(PeriodoDonchUm)|0|;
 DonchSuperiorUm := DonchianCh(PeriodoDonchUm)|1|;
 DonchInferiorUm := DonchianCh(PeriodoDonchUm)|2|;
 DonchSuperiorDois := DonchianCh(PeriodoDonchDois)|1|;
@@ -34,7 +38,7 @@ if (Fechamento[1] < DonchInferiorDois[DeslocamentoDois]) e (Fechamento > DonchIn
 
     if (Time > HoraInicio) e (Time < HoraFim) then
     begin
-      if (CondicaoCompraUm = true) then
+      if (CondicaoCompraUm = true) ou ((MediaMovelCurta > MediaMovelLonga)) then
       begin
          PaintBar(ClGreen);
       end;
@@ -44,7 +48,7 @@ if (Fechamento[1] < DonchInferiorDois[DeslocamentoDois]) e (Fechamento > DonchIn
       end;
 
 
-      if (CondicaoVendaUm = true) then
+      if (CondicaoVendaUm = true) ou (MediaMovelCurta < MediaMovelLonga) then
       begin
          PaintBar(ClRed);
       end;

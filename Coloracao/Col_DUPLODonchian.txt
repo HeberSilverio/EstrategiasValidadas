@@ -1,0 +1,102 @@
+//Dia 29/06 seria um dia de stop loss diário testar loss diário
+// Melhor condição parece ser no 8R
+
+const
+HoraInicio = 900;
+HoraFim = 1600;
+FatorCurto = 0.7;
+PeriodoCurto = 7;
+
+input
+MediaMovel(21);
+mediaLonga(70);
+PeriodoDonchUm(4); 
+PeriodoDonchDois(20);
+DeslocamentoUm(2);
+DeslocamentoDois(2);
+
+var
+MediaAritmetica, DonchSuperiorUm, DonchSuperiorDois, DonchInferiorUm, DonchInferiorDois, StopCompra, StopVenda, MediaDonchUm, MediaTilson, MediaDonchDois : Float;
+CondicaoCompraUm, CondicaoCompraDois, CondicaoCompraTres, CondicaoCompraQuatro, CondicaoCompraCinco, CondicaoCompraSeis, CondicaoVendaUm, CondicaoVendaDois, CondicaoVendaTres, CondicaoVendaQuatro, CondicaoVendaCinco, BlocoCompraUm, BlocoCompraDois, BlocoCompraTres, BlocoCompraQuatro, BlocoVendaUm, BlocoVendaDois, BlocoVendaTres, BlocoVendaQuatro, CondicaoVendaSeis : boolean;
+begin
+MediaAritmetica := Media(MediaMovel, Abertura);
+MediaTilson := Tilson(FatorCurto, PeriodoCurto);
+MediaDonchUm := DonchianCh(PeriodoDonchUm)|0|;
+MediaDonchDois := DonchianCh(PeriodoDonchDois)|0|;
+DonchSuperiorUm := DonchianCh(PeriodoDonchUm)|1|;
+DonchInferiorUm := DonchianCh(PeriodoDonchUm)|2|;
+DonchSuperiorDois := DonchianCh(PeriodoDonchDois)|1|;
+DonchInferiorDois := DonchianCh(PeriodoDonchDois)|2|;
+
+if (Fechamento > DonchSuperiorUm[DeslocamentoUm]) then CondicaoCompraUm := True else CondicaoCompraUm := false;
+if (MediaDonchUm > MediaDonchUm[1]) then CondicaoCompraDois := True else CondicaoCompraDois := false;
+if (MediaAritmetica > MediaAritmetica[1]) then CondicaoCompraTres := True else CondicaoCompraTres := false;
+if (MediaTilson > MediaTilson[1]) then CondicaoCompraQuatro := True else CondicaoCompraQuatro := false;
+if (Fechamento > MediaTilson) then CondicaoCompraCinco := True else CondicaoCompraCinco := false;
+if (MediaDonchDois > MediaDonchDois[1]) then CondicaoCompraSeis := True else CondicaoCompraSeis := false;
+
+if (Fechamento < DonchInferiorUm[DeslocamentoUm]) then CondicaoVendaUm  := True else CondicaoVendaUm := false;
+if (MediaDonchUm < MediaDonchUm[1]) then CondicaoVendaDois := True else CondicaoVendaDois := false;
+if (MediaAritmetica < MediaAritmetica[1]) then CondicaoVendaTres := True else CondicaoVendaTres := false;
+if (MediaTilson < MediaTilson[1]) then CondicaoVendaQuatro := True else CondicaoVendaQuatro := false;
+if (Fechamento < MediaTilson) then CondicaoVendaCinco := True else CondicaoVendaCinco := false;
+if (MediaDonchDois < MediaDonchDois[1]) then CondicaoVendaSeis := True else CondicaoVendaSeis := false;
+
+BlocoCompraUm := False;
+BlocoCompraDois := False;
+BlocoCompraTres := False;
+BlocoCompraQuatro := False;
+BlocoVendaUm := False;
+BlocoVendaDois := False;
+BlocoVendaTres := False;
+BlocoVendaQuatro := False;
+
+    if (Time > HoraInicio) e (Time < HoraFim) then
+    begin
+      if (CondicaoCompraUm = true) e (CondicaoCompraQuatro = true) e (CondicaoCompraCinco = true) then
+      begin
+         PaintBar(ClLime);
+         BlocoCompraUm := True;
+      end
+      else if (CondicaoCompraTres = true) e (CondicaoCompraQuatro = true) e (CondicaoCompraSeis = true) e (Fechamento > Abertura)  then
+      begin
+         PaintBar(ClGreen);
+         BlocoCompraDois := True;
+      end
+      else if (CondicaoCompraUm = True) e (CondicaoCompraCinco = true) e (Fechamento > MediaAritmetica) then
+      begin
+         PaintBar(ClBlue);
+         BlocoCompraTres := True;
+      end;
+      {else if (CondicaoCompraDois = True) e (CondicaoCompraQuatro = true) then
+      begin
+         PaintBar(ClAqua);
+         BlocoCompraQuatro := True;
+      end;  }
+
+
+      if (CondicaoVendaUm = true) e (CondicaoVendaTres = true) e (CondicaoVendaQuatro = true) e (CondicaoVendaCinco = true) then
+      begin
+         PaintBar(ClRed);
+         BlocoVendaUm := True;
+      end
+      else if (CondicaoVendaTres = true) e (CondicaoVendaQuatro = true) e (CondicaoVendaSeis = true) e (Fechamento < Abertura) then
+      begin
+         PaintBar(ClMaroon);
+         BlocoVendaDois := True;
+      end
+      else if (CondicaoVendaUm = True) e (CondicaoVendaCinco = true) e (Fechamento < MediaAritmetica) then
+      begin
+         PaintBar(ClPurple);
+         BlocoVendaTres := True;
+      end;
+     // else if (CondicaoVendaDois = True) e (CondicaoVendaQuatro = true) then
+    //  begin
+    //     PaintBar(ClFuchsia);
+    //     BlocoVendaQuatro := True;
+    //  end;
+      
+   end;
+
+
+fim;
