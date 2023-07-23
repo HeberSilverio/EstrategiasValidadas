@@ -20,7 +20,7 @@ HoraFim = 1600;
 input
 QtdMinContratos(1);
 StopGain(480);
-StopLoss(145);
+StopLoss(150);
 StopParcialApartir(150);
 QualRenko(12);
 
