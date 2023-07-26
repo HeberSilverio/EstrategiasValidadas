@@ -9,26 +9,26 @@ FatorCurto = 0.45;
 PeriodoCurto = 12;
 FatorLonga = 0.50;
 PeriodoLonga = 27;
-Desvio = 1.90;
-PeriodoKeltner = 23;// Aritmetica
-PeriodoBollinger = 22;// Aritmetica
+Desvio = 1.85;
+PeriodoKeltner = 22;// Aritmetica
+PeriodoBollinger = 21;// Aritmetica
 PeriodoDonch = 30;
 DeslocamentoDonch = 0;
 HoraInicio = 0859;
-HoraFim = 1600;
+HoraFim = 1650;
 
 input
 QtdMinContratos(1);
 StopGain(480);
 StopLoss(150);
 StopParcialApartir(150);
-QualRenko(12);
+QualRenko(15);
 
 var
 TilsonCurto, TilsonLonga, KeltnerSuperior, KeltnerInferior, BollingerSuperior, BollingerInferior, AbaixoDaCompra, AcimaDaVenda, MaximaDasUltimasTres, MinimaDasUltimasTres, VariacaoStop, DonchSuperior, DonchInferior : Float;
 
 begin
-   VariacaoStop := ((QualRenko*MinPriceIncrement)-(MinPriceIncrement*2));
+   VariacaoStop := ((QualRenko*MinPriceIncrement)-(MinPriceIncrement));
    MaximaDasUltimasTres := Highest(High, 3);
    MinimaDasUltimasTres := Lowest(Low, 3);
 
@@ -50,30 +50,24 @@ begin
 
    if (IsSold) then
    begin
-      if (SellPosition = (QtdMinContratos*3)) then 
-      begin
-         if ((SellPrice - Minima) > (StopGain)) then
-         begin
-            BuyToCoverAtMarket(QtdMinContratos*1);
-         end;
-      end;
+      
       if (SellPosition = (QtdMinContratos*4)) then 
       begin
-         if ((SellPrice - Minima) > (StopGain)) then
+         if ((SellPrice - Fechamento) > (StopGain)) then
          begin
             BuyToCoverAtMarket(QtdMinContratos*1);
          end;
       end;
       if (SellPosition = (QtdMinContratos*5)) then 
       begin
-         if ((SellPrice - Minima) > (StopGain)) then
+         if ((SellPrice - Fechamento) > (StopGain)) then
          begin
             BuyToCoverAtMarket(QtdMinContratos*1);
          end;
       end;
       if (SellPosition = (QtdMinContratos*6)) then 
       begin
-         if ((SellPrice - Minima) > (StopGain)) then
+         if ((SellPrice - Fechamento) > (StopGain)) then
          begin
             BuyToCoverAtMarket(QtdMinContratos*1);
          end;
@@ -85,7 +79,7 @@ begin
             BuyToCoverAtMarket(SellPosition);
       end;
       
-      If (fechamento < SellPrice) e (abertura < maxima[4]) e (Minima > MinimaDasUltimasTres) e (fechamento[2] < fechamento[3]) then
+      If (fechamento < SellPrice) e (fechamento > abertura) e (fechamento[1] > abertura[1]) e (fechamento[2] < fechamento[3]) then
       begin
          If ((SellPrice - fechamento) > StopParcialApartir) e ((SellPrice - fechamento) < StopGain) then
          begin
@@ -101,30 +95,24 @@ begin
 
    if (IsBought) then
    begin
-       if (BuyPosition = (QtdMinContratos*3)) then
-       begin
-           if ((Maxima - BuyPrice) > (StopGain)) then
-           begin
-              SellToCoverAtMarket(QtdMinContratos*1);
-           end; 
-       end;
+       
        if (BuyPosition = (QtdMinContratos*4)) then
        begin
-           if ((Maxima - BuyPrice) > (StopGain)) then
+           if ((Fechamento - BuyPrice) > (StopGain)) then
            begin
               SellToCoverAtMarket(QtdMinContratos*1);
            end; 
        end;
        if (BuyPosition = (QtdMinContratos*5)) then
        begin
-           if ((Maxima - BuyPrice) > (StopGain)) then
+           if ((Fechamento - BuyPrice) > (StopGain)) then
            begin
               SellToCoverAtMarket(QtdMinContratos*1);
            end; 
        end;
        if (BuyPosition = (QtdMinContratos*6)) then
        begin
-           if ((Maxima - BuyPrice) > (StopGain)) then
+           if ((Fechamento - BuyPrice) > (StopGain)) then
            begin
               SellToCoverAtMarket(QtdMinContratos*1);
            end;  
@@ -136,7 +124,7 @@ begin
             SellToCoverAtMarket(BuyPosition);
       end;
 
-      If (fechamento > BuyPrice) e (abertura > minima[4]) e (maxima < MaximaDasUltimasTres) e (fechamento[2] > fechamento[3]) then
+      If (fechamento > BuyPrice) e (fechamento < abertura) e (fechamento[1] < abertura[1]) e (fechamento[2] > fechamento[3]) then
       begin
          If ((fechamento - BuyPrice) > StopParcialApartir) e ((fechamento - BuyPrice) < StopGain) then
          begin
@@ -185,6 +173,10 @@ begin
       end;
       if (BuyPosition > 0) e (BuyPosition < (QtdMinContratos*5)) e (Fechamento > BuyPrice) e ((Fechamento - BuyPrice) < (VariacaoStop*4)) then
       begin
+          if (fechamento > abertura) then
+         begin
+           BuyLimit(Abertura+(MinPriceIncrement*5), QtdMinContratos);
+         end;
          if (fechamento > KeltnerInferior) then
          begin
            BuyLimit(KeltnerInferior, QtdMinContratos);
@@ -196,10 +188,6 @@ begin
          if (fechamento > DonchInferior[DeslocamentoDonch]) then
          begin
            BuyLimit(DonchInferior[DeslocamentoDonch]-15, QtdMinContratos);
-         end;
-         if (fechamento > abertura) then
-         begin
-         BuyLimit(Abertura+40, QtdMinContratos);
          end;
       end;
    end;
@@ -238,6 +226,10 @@ begin
       end;
       if (SellPosition > 0) e (SellPosition < (QtdMinContratos*5)) e ((SellPrice - fechamento) < (VariacaoStop*4)) then
       begin
+        if (fechamento < abertura) then
+        begin
+         SellShortLimit(Abertura-(MinPriceIncrement*5), QtdMinContratos);
+        end; 
         if (fechamento < KeltnerSuperior) then
         begin
          SellShortLimit(KeltnerSuperior, QtdMinContratos);
@@ -249,10 +241,6 @@ begin
         if (fechamento < DonchSuperior[DeslocamentoDonch]) then
         begin
          SellShortLimit(DonchSuperior[DeslocamentoDonch], QtdMinContratos);
-        end;
-        if (fechamento < abertura) then
-        begin
-         SellShortLimit(Abertura-40, QtdMinContratos);
         end;
       end;
    end;
