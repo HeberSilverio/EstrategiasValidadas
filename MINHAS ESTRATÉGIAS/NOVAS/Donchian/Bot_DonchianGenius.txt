@@ -1,0 +1,62 @@
+const
+PeriodoDonchUm = 2;
+DeslocamentoUm = 1;
+input
+StopLoss(200);
+QtdMinContratos(1);
+var
+DonchSuperiorUm, DonchInferiorUm, AcimaDaVenda, AbaixoDaCompra : Float;
+sinalC,sinalv,stopC,stopV : booleano;
+cor : inteiro;
+
+begin
+   DonchSuperiorUm := DonchianCh(PeriodoDonchUm)|1|;
+   DonchInferiorUm := DonchianCh(PeriodoDonchUm)|2|;
+   if (close < BuyPrice) then AbaixoDaCompra := (BuyPrice - fechamento) else AbaixoDaCompra := 0;
+   if (close > SellPrice) then AcimaDaVenda := (fechamento - SellPrice) else AcimaDaVenda := 0;
+
+   Plot(DonchSuperiorUm);
+   Plot2(DonchInferiorUm);
+   
+   if (IsSold) then
+   begin
+      if (Fechamento > SellPrice) then
+      begin 
+         if (AcimaDaVenda > StopLoss) then
+            BuyToCoverAtMarket(SellPosition);
+      end;
+      If (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+      begin
+         BuyToCoverLimit(DonchInferiorUm[DeslocamentoUm], SellPosition);
+      end;
+   end;
+
+   if (IsBought) then
+   begin
+      if (Fechamento < BuyPrice) then
+      begin 
+         if (AbaixoDaCompra > StopLoss) then
+            SellToCoverAtMarket(BuyPosition);
+      end;
+
+      If (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+      begin
+         SelltoCoverLimit(DonchSuperiorUm[DeslocamentoUm], BuyPosition);
+      end;
+   end;
+
+
+   Se (HasPosition = False) então
+   begin
+      if (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+      begin
+         SellShortLimit(DonchSuperiorUm[DeslocamentoUm], QtdMinContratos);
+      end;
+
+
+      if (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+      begin
+         BuyLimit(DonchInferiorUm[DeslocamentoUm], QtdMinContratos);
+      end;
+   end;
+end;

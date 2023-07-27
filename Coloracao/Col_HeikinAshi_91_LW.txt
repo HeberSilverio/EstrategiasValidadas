@@ -1,0 +1,48 @@
+const
+FatorCurto = 0.50;
+PeriodoCurto = 7;
+PeriodoMedia = 21;
+PeriodoDonchUm = 2;
+DeslocamentoUm = 1;
+PeriodoDonchDois = 4;
+DeslocamentoDois = 3; 
+var
+hC,hO, TilsonCurto,ValorMACD,MediaMacd, DonchSuperiorUm, DonchInferiorUm,DonchSuperiorDois, DonchInferiorDois : Real;
+sinalC,sinalv,stopC,stopV : booleano;
+cor : inteiro;
+
+Inicio
+  hO := HeikinAshi(1,0)|0|;
+  hC := HeikinAshi(1,0)|1|;
+  TilsonCurto := Tilson(FatorCurto, PeriodoCurto);
+  ValorMACD := MACD(130,19,14)|0|;
+  MediaMacd := Media(PeriodoMedia, ValorMACD);
+  DonchSuperiorUm := DonchianCh(PeriodoDonchUm)|1|;
+  DonchInferiorUm := DonchianCh(PeriodoDonchUm)|2|;
+  DonchSuperiorDois := DonchianCh(PeriodoDonchDois)|1|;
+  DonchInferiorDois := DonchianCh(PeriodoDonchDois)|2|;
+
+   if (hC > hO) e (fechamento > DonchSuperiorUm[DeslocamentoUm]) then sinalC := true else sinalC := false;
+   
+   if (hC < hO) e (fechamento < DonchInferiorUm[DeslocamentoUm]) then sinalV := true else sinalV := false;
+   
+   if (fechamento < DonchInferiorDois[DeslocamentoDois]) then stopC := true else stopC := false;
+   if (fechamento > DonchInferiorDois[DeslocamentoDois]) then stopV := true else stopV := false;
+   
+   //COLORAÇÃO
+   se sinalC entao cor := cllime
+   senao se sinalV entao cor := clred
+   senao cor := clwhite;
+   se (cor[1] = cllime) e (stopC = false) entao cor:=cllime;
+   se (cor[1] = clred) e (not stopV) entao cor:=clred;
+   PaintBar(cor); 
+  
+  {Se  então
+   
+    PaintBar(clVerde)
+  Senão Se  então 
+   
+
+    PaintBar(clVermelho);}
+
+Fim;
