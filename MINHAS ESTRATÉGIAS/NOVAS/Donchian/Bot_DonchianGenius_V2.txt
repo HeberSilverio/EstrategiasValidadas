@@ -1,18 +1,18 @@
-//Esta versão está sempre colocando ordem em cima e embaixo sem importar com nada
-
+//Esta versão considera a linha central do Donchian. Se ela estiver flat ele coloca dos dois lados, se ela estiver subindo só coloca compra
 input
 StopLoss(200);
 QtdMinContratos(1);
 PeriodoDonchUm (4);
 DeslocamentoUm (1);
 var
-DonchSuperiorUm, DonchInferiorUm, AcimaDaVenda, AbaixoDaCompra : Float;
+DonchSuperiorUm, DonchInferiorUm, DonchMedia, AcimaDaVenda, AbaixoDaCompra : Float;
 sinalC,sinalv,stopC,stopV : booleano;
 cor : inteiro;
 
 begin
    DonchSuperiorUm := DonchianCh(PeriodoDonchUm)|1|;
    DonchInferiorUm := DonchianCh(PeriodoDonchUm)|2|;
+   DonchMedia := DonchianCh(PeriodoDonchUm)|0|;
    if (close < BuyPrice) then AbaixoDaCompra := (BuyPrice - fechamento) else AbaixoDaCompra := 0;
    if (close > SellPrice) then AcimaDaVenda := (fechamento - SellPrice) else AcimaDaVenda := 0;
 
@@ -49,15 +49,34 @@ begin
 
    Se (HasPosition = False) então
    begin
-      if (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+      if (DonchMedia[0] < DonchMedia[1]) then
       begin
-         SellShortLimit(DonchSuperiorUm[DeslocamentoUm], QtdMinContratos);
+         if (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+         begin
+            SellShortLimit(DonchSuperiorUm[DeslocamentoUm], QtdMinContratos);
+         end;
+      end;
+      
+
+      if (DonchMedia[0] > DonchMedia[1]) then
+      begin
+         if (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+         begin
+            BuyLimit(DonchInferiorUm[DeslocamentoUm], QtdMinContratos);
+         end;
       end;
 
-
-      if (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+      if (DonchMedia[0] = DonchMedia[1]) then
       begin
-         BuyLimit(DonchInferiorUm[DeslocamentoUm], QtdMinContratos);
+         if (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+         begin
+            SellShortLimit(DonchSuperiorUm[DeslocamentoUm], QtdMinContratos);
+         end;
+         if (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+         begin
+            BuyLimit(DonchInferiorUm[DeslocamentoUm], QtdMinContratos);
+         end;
       end;
+
    end;
 end;

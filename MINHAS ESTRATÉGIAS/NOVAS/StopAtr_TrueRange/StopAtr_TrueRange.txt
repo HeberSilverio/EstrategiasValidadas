@@ -1,7 +1,7 @@
 //Winfut 2Min
 // vol 10
 // Alvo 1.15
-// Stop 0. 90
+// Stop 0.90
 // 09:20 as 17:00
 Input
 Alvo(1.10);
