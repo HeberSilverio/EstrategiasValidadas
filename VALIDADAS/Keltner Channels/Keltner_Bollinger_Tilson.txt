@@ -1,7 +1,7 @@
 // testado o resultado apenas no 14r
 // Colocar 6 contratos por operação
 // 09:00 até 16:00 - zerar as 17:38
-// Perda do dia -450
+// Perda do dia -330
 //Trend Cloud 0.45 12 0.50 27 | Keltner 1,75 23A   | Bollinger 1,75 - 20A
 
 const
@@ -9,20 +9,22 @@ FatorCurto = 0.45;
 PeriodoCurto = 12;
 FatorLonga = 0.50;
 PeriodoLonga = 27;
-Desvio = 1.80;
+Desvio = 1.90;
 PeriodoKeltner = 20;// Aritmetica
 PeriodoBollinger = 21;// Aritmetica
-HoraInicio = 900;
-HoraFim = 1600;
+PeriodoDonch = 27;
+DeslocamentoDonch = 1;
+HoraInicio = 0859;
+HoraFim = 1545;
 input
 QtdMinContratos(1);
-StopGain(480);
+StopGain(900);
 StopLoss(145);
-StopParcialApartir(200);
+StopParcialApartir(175);
 QualRenko(14);
 
 var
-TilsonCurto, TilsonLonga, KeltnerSuperior, KeltnerInferior, BollingerSuperior, BollingerInferior, AbaixoDaCompra, AcimaDaVenda, MaximaDasUltimasTres, MinimaDasUltimasTres, VariacaoStop : Float;
+TilsonCurto, TilsonLonga, KeltnerSuperior, KeltnerInferior, BollingerSuperior, BollingerInferior, AbaixoDaCompra, AcimaDaVenda, MaximaDasUltimasTres, MinimaDasUltimasTres, VariacaoStop, DonchSuperior, DonchInferior : Float;
 
 begin
    VariacaoStop := ((QualRenko*MinPriceIncrement)-(MinPriceIncrement*2));
@@ -39,18 +41,15 @@ begin
    BollingerSuperior := BollingerBands(Desvio, PeriodoBollinger, 0)|0|;
    BollingerInferior := BollingerBands(Desvio, PeriodoBollinger, 0)|1|;
 
+   DonchSuperior := DonchianCh(PeriodoDonch)|1|;
+   DonchInferior := DonchianCh(PeriodoDonch)|2|;
+
    if (close < BuyPrice) then AbaixoDaCompra := (BuyPrice - fechamento) else AbaixoDaCompra := 0;
    if (close > SellPrice) then AcimaDaVenda := (fechamento - SellPrice) else AcimaDaVenda := 0;
 
    if (IsSold) then
    begin
-      if (SellPosition = (QtdMinContratos*3)) then 
-      begin
-         if ((SellPrice - Minima) > (StopGain)) then
-         begin
-            BuyToCoverAtMarket(QtdMinContratos*1);
-         end;
-      end;
+      
       if (SellPosition = (QtdMinContratos*4)) then 
       begin
          if ((SellPrice - Minima) > (StopGain)) then
@@ -95,13 +94,7 @@ begin
 
    if (IsBought) then
    begin
-       if (BuyPosition = (QtdMinContratos*3)) then
-       begin
-           if ((Maxima - BuyPrice) > (StopGain)) then
-           begin
-              SellToCoverAtMarket(QtdMinContratos*1);
-           end; 
-       end;
+       
        if (BuyPosition = (QtdMinContratos*4)) then
        begin
            if ((Maxima - BuyPrice) > (StopGain)) then
@@ -156,6 +149,10 @@ begin
          begin
            BuyLimit(BollingerInferior-15, QtdMinContratos);
          end;
+         if (fechamento > DonchInferior[DeslocamentoDonch]) then
+         begin
+           BuyLimit(DonchInferior[DeslocamentoDonch]-15, QtdMinContratos);
+         end;
       end;
       if (BuyPosition > 0) e (BuyPosition < (QtdMinContratos*4)) e (Fechamento < BuyPrice) then
       begin
@@ -167,9 +164,17 @@ begin
          begin
            BuyLimit(BollingerInferior-15, QtdMinContratos);
          end;
+         if (fechamento > DonchInferior[DeslocamentoDonch]) then
+         begin
+           BuyLimit(DonchInferior[DeslocamentoDonch]-15, QtdMinContratos);
+         end;
       end;
       if (BuyPosition > 0) e (BuyPosition < (QtdMinContratos*4)) e (Fechamento > BuyPrice) e ((Fechamento - BuyPrice) < (VariacaoStop*5)) then
       begin
+         if (fechamento > abertura) then
+         begin
+           BuyLimit(Abertura, QtdMinContratos);
+         end; 
          if (fechamento > KeltnerInferior) then
          begin
            BuyLimit(KeltnerInferior-15, QtdMinContratos);
@@ -178,9 +183,9 @@ begin
          begin
            BuyLimit(BollingerInferior-15, QtdMinContratos);
          end;
-         if (fechamento > abertura) then
+         if (fechamento > DonchInferior[DeslocamentoDonch]) then
          begin
-         BuyLimit(Abertura, QtdMinContratos);
+           BuyLimit(DonchInferior[DeslocamentoDonch]-15, QtdMinContratos);
          end;
       end;
    end;
@@ -197,6 +202,10 @@ begin
         begin
          SellShortLimit(BollingerSuperior+15, QtdMinContratos);
         end;
+        if (fechamento < DonchSuperior[DeslocamentoDonch]) then
+        begin
+         SellShortLimit(DonchSuperior[DeslocamentoDonch], QtdMinContratos);
+        end;
       end;
       if (SellPosition > 0) e (SellPosition < (QtdMinContratos*4)) e (fechamento > SellPrice) then
       begin
@@ -208,9 +217,17 @@ begin
         begin
          SellShortLimit(BollingerSuperior+15, QtdMinContratos);
         end;
+        if (fechamento < DonchSuperior[DeslocamentoDonch]) then
+        begin
+         SellShortLimit(DonchSuperior[DeslocamentoDonch], QtdMinContratos);
+        end;
       end;
       if (SellPosition > 0) e (SellPosition < (QtdMinContratos*4)) e (fechamento < SellPrice) e ((SellPrice - fechamento) < (VariacaoStop*5)) then
       begin
+        if (fechamento < abertura) then
+        begin
+         SellShortLimit(Abertura, QtdMinContratos);
+        end;
         if (fechamento < KeltnerSuperior) then
         begin
          SellShortLimit(KeltnerSuperior, QtdMinContratos);
@@ -219,11 +236,24 @@ begin
         begin
          SellShortLimit(BollingerSuperior+15, QtdMinContratos);
         end;
-        if (fechamento < abertura) then
+        if (fechamento < DonchSuperior[DeslocamentoDonch]) then
         begin
-         SellShortLimit(Abertura, QtdMinContratos);
+         SellShortLimit(DonchSuperior[DeslocamentoDonch], QtdMinContratos);
         end;
       end;
    end;
    Se (Time > 1738) então ClosePosition;
+   //Plotagem
+   plot(KeltnerSuperior);
+   SetPlotColor(1, clyellow);
+   Plot2(KeltnerInferior);
+   SetPlotColor(2, clyellow);
+   plot3(BollingerSuperior);
+   SetPlotColor(3, clAqua);
+   Plot4(BollingerInferior);
+   SetPlotColor(4, clAqua);
+   plot5(DonchSuperior);
+   SetPlotColor(5, clMaroon);
+   Plot6(DonchInferior);
+   SetPlotColor(6, clMaroon);
 end;

@@ -1,7 +1,7 @@
 // testado o resultado apenas no 12Pontos
 // Colocar 6 contratos por operação
 // 09:00 até 16:00 - zerar as 17:38
-// Perda do dia -450
+// Perda do dia -330
 //Trend Cloud 0.45 12 0.50 27 | Keltner 1,90 23A   | Bollinger 2 - 22A | Donchian Des0 Periodo 30
 
 const
@@ -19,7 +19,7 @@ HoraFim = 1650;
 
 input
 QtdMinContratos(1);
-StopGain(480);
+StopGain(900);
 StopLoss(150);
 StopParcialApartir(150);
 QualRenko(15);
@@ -171,7 +171,7 @@ begin
          end;
          
       end;
-      if (BuyPosition > 0) e (BuyPosition < (QtdMinContratos*5)) e (Fechamento > BuyPrice) e ((Fechamento - BuyPrice) < (VariacaoStop*4)) then
+      if (BuyPosition > 0) e (BuyPosition < (QtdMinContratos*5)) e (Fechamento > BuyPrice) e ((Fechamento - BuyPrice) < (VariacaoStop*3)) then
       begin
           if (fechamento > abertura) then
          begin
@@ -224,7 +224,7 @@ begin
          SellShortLimit(DonchSuperior[DeslocamentoDonch], QtdMinContratos);
         end;
       end;
-      if (SellPosition > 0) e (SellPosition < (QtdMinContratos*5)) e ((SellPrice - fechamento) < (VariacaoStop*4)) then
+      if (SellPosition > 0) e (SellPosition < (QtdMinContratos*5)) e ((SellPrice - fechamento) < (VariacaoStop*3)) then
       begin
         if (fechamento < abertura) then
         begin
