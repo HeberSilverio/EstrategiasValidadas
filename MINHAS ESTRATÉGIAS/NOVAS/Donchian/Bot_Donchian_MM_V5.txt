@@ -1,0 +1,137 @@
+// Considera a linha central do Donchian. Se ela estiver flat ele coloca dos dois lados, se ela estiver subindo só coloca compra
+// Adiciona o stop pelo AvgTrueRange
+// Esta versão o gain mínimo é 50 reais
+const
+HoraInicio = 0901;
+HoraFim = 1730;
+GanhoMinimo = 80;
+input
+TrueRangeXstop(3.20);
+QtdMinContratos(5);
+PeriodoDonchUm (3);
+DeslocamentoUm (1);
+StopLoss (250);
+var
+DonchSuperiorUm, DonchInferiorUm, DonchMedia, AcimaDaVenda, AbaixoDaCompra, StopVol : Float;
+sinalC,sinalv,stopC,stopV : booleano;
+cor : inteiro;
+
+begin
+   DonchSuperiorUm := DonchianCh(PeriodoDonchUm)|1|;
+   DonchInferiorUm := DonchianCh(PeriodoDonchUm)|2|;
+   DonchMedia := DonchianCh(PeriodoDonchUm)|0|;
+
+   StopVol := AvgTrueRange(10, 0);
+   if (StopVol > 55) then StopVol := 55;
+   
+   //StopLoss := ((StopVol*TrueRangeXstop) + StopVol);
+   
+   if (close < BuyPrice) then AbaixoDaCompra := (BuyPrice - fechamento) else AbaixoDaCompra := 0;
+   if (close > SellPrice) then AcimaDaVenda := (fechamento - SellPrice) else AcimaDaVenda := 0;
+
+   Plot(DonchSuperiorUm);
+   Plot2(DonchInferiorUm);
+   
+   if (IsSold) then
+   begin
+      //STOP LOSS
+      BuyToCoverStop(SellPrice+(StopVol*TrueRangeXstop), SellPrice+(StopVol*TrueRangeXstop)+(60*MinPriceIncrement), SellPosition); // loss variavel
+      if (DonchInferiorUm[DeslocamentoUm] > SellPrice) then
+      begin
+         ReversePosition;
+      end;
+      // CASO PULE O STOP
+      if (Fechamento > SellPrice) then
+      begin 
+         if (AcimaDaVenda > StopLoss) then
+            BuyToCoverAtMarket(SellPosition);
+      end;
+      //GAIN
+      if ((SellPrice - DonchInferiorUm[DeslocamentoUm]) < GanhoMinimo) then
+      begin
+         BuyToCoverLimit(SellPrice-GanhoMinimo, SellPosition);
+      end;
+      if ((SellPrice - DonchInferiorUm[DeslocamentoUm]) > GanhoMinimo) then
+      begin
+         If (fechamento >= DonchInferiorUm[DeslocamentoUm]) then
+         begin
+            BuyToCoverLimit(DonchInferiorUm[DeslocamentoUm]+MinPriceIncrement, SellPosition);
+         end;
+         If (fechamento < DonchInferiorUm[DeslocamentoUm]) then
+         begin
+            BuyToCoverAtMarket(SellPosition);  
+         end;
+      end;
+
+
+   end;
+
+   if (IsBought) then
+   begin
+      //STOP LOSS
+      //loss variavel
+      SellToCoverStop(BuyPrice-(StopVol*TrueRangeXstop), BuyPrice-(StopVol*TrueRangeXstop)-(60*MinPriceIncrement), BuyPosition);
+      if (DonchSuperiorUm[DeslocamentoUm] < BuyPrice) then
+      begin
+         ReversePosition;
+      end;
+      // Caso pule o stop
+      if (Fechamento < BuyPrice) then
+      begin 
+         if (AbaixoDaCompra > StopLoss) then
+         begin
+            SellToCoverAtMarket(BuyPosition);
+         end;
+      end;
+      
+      //Gain
+      if ((DonchSuperiorUm[DeslocamentoUm] - BuyPrice) < (GanhoMinimo)) then
+      begin
+         SelltoCoverLimit(BuyPrice+GanhoMinimo, BuyPosition);
+      end;
+      If ((DonchSuperiorUm[DeslocamentoUm] - BuyPrice) > (GanhoMinimo)) then
+      begin
+         If (fechamento <= DonchSuperiorUm[DeslocamentoUm]) then
+         begin
+            SelltoCoverLimit(DonchSuperiorUm[DeslocamentoUm], BuyPosition);   
+         end;
+         If (fechamento > DonchSuperiorUm[DeslocamentoUm]) then
+         begin
+            SellToCoverAtMarket(BuyPosition);
+         end;
+      end;
+   end;
+
+
+   Se (HasPosition = False) e (Time > HoraInicio) e (Time < HoraFim)  então
+   begin
+      if (DonchMedia[0] < DonchMedia[1]) then
+      begin
+         if (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+         begin
+            SellShortStop(DonchInferiorUm[DeslocamentoUm], DonchInferiorUm[DeslocamentoUm]-(20*MinPriceIncrement), QtdMinContratos);
+         end;
+      end;
+
+      if (DonchMedia[0] > DonchMedia[1]) then
+      begin
+         if (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+         begin
+            BuyStop(DonchSuperiorUm[DeslocamentoUm], DonchSuperiorUm[DeslocamentoUm]+(20*MinPriceIncrement), QtdMinContratos);
+         end;
+      end;
+
+      if (DonchMedia[0] = DonchMedia[1]) then
+      begin
+         if (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+         begin
+            BuyStop(DonchSuperiorUm[DeslocamentoUm], DonchSuperiorUm[DeslocamentoUm]+(20*MinPriceIncrement), QtdMinContratos);
+         end;
+         if (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+         begin
+            SellShortStop(DonchInferiorUm[DeslocamentoUm], DonchInferiorUm[DeslocamentoUm]-(20*MinPriceIncrement), QtdMinContratos);
+         end;
+      end;
+   end;
+   Se (Time > 1738) então ClosePosition;
+end;
