@@ -4,7 +4,7 @@
 const
 HoraInicio = 0901;
 HoraFim = 1730;
-GanhoMinimo = 80;
+GanhoMinimo = 100;
 input
 TrueRangeXstop(3.20);
 QtdMinContratos(5);
@@ -36,7 +36,7 @@ begin
    begin
       //STOP LOSS
       BuyToCoverStop(SellPrice+(StopVol*TrueRangeXstop), SellPrice+(StopVol*TrueRangeXstop)+(60*MinPriceIncrement), SellPosition); // loss variavel
-      if (DonchInferiorUm[DeslocamentoUm] > SellPrice) then
+      if ((DonchInferiorUm[DeslocamentoUm]-(MinPriceIncrement*3)) > SellPrice) then
       begin
          ReversePosition;
       end;
@@ -71,7 +71,7 @@ begin
       //STOP LOSS
       //loss variavel
       SellToCoverStop(BuyPrice-(StopVol*TrueRangeXstop), BuyPrice-(StopVol*TrueRangeXstop)-(60*MinPriceIncrement), BuyPosition);
-      if (DonchSuperiorUm[DeslocamentoUm] < BuyPrice) then
+      if ((DonchSuperiorUm[DeslocamentoUm]+(MinPriceIncrement*3)) < BuyPrice) then
       begin
          ReversePosition;
       end;
@@ -107,29 +107,29 @@ begin
    begin
       if (DonchMedia[0] < DonchMedia[1]) then
       begin
-         if (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+         if (fechamento > (DonchInferiorUm[DeslocamentoUm]+(MinPriceIncrement*4)) ) then
          begin
-            SellShortStop(DonchInferiorUm[DeslocamentoUm], DonchInferiorUm[DeslocamentoUm]-(20*MinPriceIncrement), QtdMinContratos);
+            SellShortStop((DonchInferiorUm[DeslocamentoUm]-MinPriceIncrement), (DonchInferiorUm[DeslocamentoUm]-MinPriceIncrement)-(20*MinPriceIncrement), QtdMinContratos);
          end;
       end;
 
       if (DonchMedia[0] > DonchMedia[1]) then
       begin
-         if (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+         if (fechamento < (DonchSuperiorUm[DeslocamentoUm]-(MinPriceIncrement*4)) ) then
          begin
-            BuyStop(DonchSuperiorUm[DeslocamentoUm], DonchSuperiorUm[DeslocamentoUm]+(20*MinPriceIncrement), QtdMinContratos);
+            BuyStop((DonchSuperiorUm[DeslocamentoUm]+MinPriceIncrement), (DonchSuperiorUm[DeslocamentoUm]+MinPriceIncrement)+(20*MinPriceIncrement), QtdMinContratos);
          end;
       end;
 
       if (DonchMedia[0] = DonchMedia[1]) then
       begin
-         if (fechamento < DonchSuperiorUm[DeslocamentoUm]) then
+         if (fechamento < (DonchSuperiorUm[DeslocamentoUm]-(MinPriceIncrement*4)) ) then
          begin
-            BuyStop(DonchSuperiorUm[DeslocamentoUm], DonchSuperiorUm[DeslocamentoUm]+(20*MinPriceIncrement), QtdMinContratos);
+            BuyStop((DonchSuperiorUm[DeslocamentoUm]+MinPriceIncrement), (DonchSuperiorUm[DeslocamentoUm]+MinPriceIncrement)+(20*MinPriceIncrement), QtdMinContratos);
          end;
-         if (fechamento > DonchInferiorUm[DeslocamentoUm]) then
+         if (fechamento > (DonchInferiorUm[DeslocamentoUm]+(MinPriceIncrement*4)) ) then
          begin
-            SellShortStop(DonchInferiorUm[DeslocamentoUm], DonchInferiorUm[DeslocamentoUm]-(20*MinPriceIncrement), QtdMinContratos);
+            SellShortStop((DonchInferiorUm[DeslocamentoUm]-MinPriceIncrement), (DonchInferiorUm[DeslocamentoUm]-MinPriceIncrement)-(20*MinPriceIncrement), QtdMinContratos);
          end;
       end;
    end;
